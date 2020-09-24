@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="prometheus.model.gym">
+      <HintPath>..\prometheus.model.gym\bin\Debug\netcoreapp3.1\prometheus.model.gym.dll</HintPath>
+    </Reference>
+    <Reference Include="prometheus.dto.gym">
+      <HintPath>..\prometheus.dto.gym\bin\Debug\netcoreapp3.1\prometheus.dto.gym.dll</HintPath>
+    </Reference>
+    
+    <Reference Include="prometheus.model.securitas">
+      <HintPath>..\prometheus.model.securitas\bin\Debug\netcoreapp3.1\prometheus.model.securitas.dll</HintPath>
+    </Reference>
+
+   <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0"/>
+   <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0"/>   
+   <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0"/>
+   <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0"/>
+
+   <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="4.0.1"/>
+   <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.0.0"/>
+   <PackageReference Include="System.Data.SQLite.Core" Version="*"/>
+  </ItemGroup>
+</Project>

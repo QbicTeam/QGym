@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="prometheus.model.securitas">
+      <HintPath>..\prometheus.model.securitas\bin\Debug\netcoreapp3.1\prometheus.model.securitas.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

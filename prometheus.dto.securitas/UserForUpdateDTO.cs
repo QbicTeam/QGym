@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace QGym.API.DTO.Security
+namespace prometheus.dto.securitas
 {
     public class UserForUpdateDTO
     {

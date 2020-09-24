@@ -10,12 +10,15 @@ using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
 using System.Linq;
 
-using QGym.API.Data.Security;
-using QGym.API.DTO.Security;
-using QGym.API.Model.Security;
+// using QGym.API.Data.Security;
+// using QGym.API.DTO.Security;
+// using QGym.API.Model.Security;
+using prometheus.data.securitas;
+using prometheus.model.securitas;
+using prometheus.dto.securitas;
 // using SIQbic.API.Model.Enums;
 
-namespace QGym.API.Controllers.Security
+namespace QGym.API.Controllers // .Security
 {
     [Route("[controller]")]
     [ApiController]

@@ -2,7 +2,9 @@ using System;
 using AutoMapper;
 using System.Collections.Generic;
 
-using QGym.API.DTO;
+// using QGym.API.DTO;
+using prometheus.dto.securitas;
+
 /*using Framework.DataTypes.Model.Base;
 using Framework.DataTypes.Model.Licenciamiento;
 using Framework.DataTypes.Model.Infraestructura;

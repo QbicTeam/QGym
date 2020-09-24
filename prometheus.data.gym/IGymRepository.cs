@@ -6,8 +6,9 @@ using Framework.DataTypes.Model.Base;
 using Framework.DataTypes.Model.Licenciamiento;
 using Framework.DataTypes.Model.Infraestructura;
 */
+using prometheus.model.gym;
 
-namespace QGym.API.Data
+namespace prometheus.data.gym
 {
     public interface IGymRepository
     {

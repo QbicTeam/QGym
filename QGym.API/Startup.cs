@@ -17,10 +17,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using QGym.API.Data;
-using QGym.API.Data.Security;
+// using Microsoft.EntityFrameworkCore;
+// using Microsoft.EntityFrameworkCore.Diagnostics;
+// using QGym.API.Data;
+// using QGym.API.Data.Security;
+
+using prometheus.data.securitas;
+using prometheus.data.gym;
 
 using AutoMapper;
 
@@ -38,7 +41,7 @@ namespace QGym.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-           services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
+           services.AddDbContext<prometheus.data.gym.DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
                .ConfigureWarnings(w => w.Ignore(CoreEventId.IncludeIgnoredWarning)));
 
            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);

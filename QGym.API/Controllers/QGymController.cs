@@ -5,8 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 using AutoMapper;
-using QGym.API.DTO;
-using QGym.API.Data;
+// using QGym.API.DTO;
+using prometheus.dto.securitas;
+// using QGym.API.Data;
+using prometheus.dto.gym;
+using prometheus.model.gym;
 
 //using QGym.API.Model;
 /*
@@ -17,6 +20,19 @@ using Framework.DataTypes.Model.Infraestructura;
 
 // using Framework.Helpers.Infrastructure;
 // using Framework.Helpers;
+
+//  prometheus.model.securitas
+//  prometheus.model.gym
+
+//  prometheus.dto.securitas
+//  prometheus.dto.gym
+
+//  prometheus.data.securitas
+//  prometheus.data.gym
+
+using prometheus.data.gym;
+using prometheus.model.gym;
+using prometheus.dto.gym;
 
 namespace QGym.API.Controllers
 {

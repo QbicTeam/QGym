@@ -1,7 +1,9 @@
 using System;
-using QGym.API.Model.Security;
+// using QGym.API.Model.Security;
 
-namespace QGym.API.DTO.Security
+using prometheus.model.securitas;
+
+namespace prometheus.dto.securitas
 {
     public class RegistrationCodeForReport
     {
@@ -21,6 +23,6 @@ namespace QGym.API.DTO.Security
 
         public string SponsorEmail { get; set; }
 
-        public Role Role { get; set; }        
+        public Role Role { get; set; }       
     }
 }

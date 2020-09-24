@@ -1,4 +1,4 @@
-namespace QGym.API.Model.Security
+namespace prometheus.model.securitas
 {
     public class Role
     {

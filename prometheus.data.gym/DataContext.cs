@@ -5,11 +5,15 @@ using Framework.DataTypes.Model.Licenciamiento;
 using Framework.DataTypes.Model.Infraestructura;
 */
 
-using QGym.API.Model;
+// using QGym.API.Model;
 
-using QGym.API.Model.Security;
+// using QGym.API.Model.Security;
+using prometheus.model.gym;
+using prometheus.dto.gym;
 
-namespace QGym.API.Data
+using prometheus.model.securitas;
+
+namespace prometheus.data.gym
 {
     public class DataContext: DbContext
     {

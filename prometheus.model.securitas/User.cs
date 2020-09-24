@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace QGym.API.Model.Security
+namespace prometheus.model.securitas
 {
     public class User
     {

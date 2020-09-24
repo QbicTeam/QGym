@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-using QGym.API.Model.Security;
+//using QGym.API.Model.Security;
+using prometheus.model.securitas;
+
+// using Model.Securitas;
 // using QGym.API.Model.Security.Enums;
 
-namespace QGym.API.Data.Security
+namespace prometheus.data.securitas
 {
     public class AuthRepository: IAuthRepository
     {

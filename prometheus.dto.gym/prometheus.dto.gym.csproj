@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="prometheus.model.gym">
+      <HintPath>..\prometheus.model.gym\bin\Debug\netcoreapp3.1\prometheus.model.gym.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
