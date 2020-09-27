@@ -10,6 +10,7 @@ using prometheus.dto.securitas;
 // using QGym.API.Data;
 using prometheus.dto.gym;
 using prometheus.model.gym;
+using prometheus.data.gym;
 
 //using QGym.API.Model;
 /*
@@ -30,9 +31,6 @@ using Framework.DataTypes.Model.Infraestructura;
 //  prometheus.data.securitas
 //  prometheus.data.gym
 
-using prometheus.data.gym;
-using prometheus.model.gym;
-using prometheus.dto.gym;
 
 namespace QGym.API.Controllers
 {

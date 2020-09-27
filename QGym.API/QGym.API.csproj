@@ -5,38 +5,26 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="prometheus.model.securitas">
-      <HintPath>..\prometheus.model.securitas\bin\Debug\netcoreapp3.1\prometheus.model.securitas.dll</HintPath>
-    </Reference>
-    <Reference Include="prometheus.dto.securitas">
-      <HintPath>..\prometheus.dto.securitas\bin\Debug\netcoreapp3.1\prometheus.dto.securitas.dll</HintPath>
-    </Reference>
-    <Reference Include="prometheus.data.securitas">
-      <HintPath>..\prometheus.data.securitas\bin\Debug\netcoreapp3.1\prometheus.data.securitas.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\prometheus.model.securitas\prometheus.model.securitas.csproj" />
+    <ProjectReference Include="..\prometheus.dto.securitas\prometheus.dto.securitas.csproj"/>
+	  <ProjectReference Include="..\prometheus.data.securitas\prometheus.data.securitas.csproj"/>
+    
+    <ProjectReference Include="..\prometheus.model.gym\prometheus.model.gym.csproj"/>
+    <ProjectReference Include="..\prometheus.dto.gym\prometheus.dto.gym.csproj"/>
+    <ProjectReference Include="..\prometheus.data.gym\prometheus.data.gym.csproj"/>
 
-    <Reference Include="prometheus.model.gym">
-      <HintPath>..\prometheus.model.gym\bin\Debug\netcoreapp3.1\prometheus.model.gym.dll</HintPath>
-    </Reference>
-    <Reference Include="prometheus.dto.gym">
-      <HintPath>..\prometheus.dto.gym\bin\Debug\netcoreapp3.1\prometheus.dto.gym.dll</HintPath>
-    </Reference>
-    <Reference Include="prometheus.data.gym">
-      <HintPath>..\prometheus.data.gym\bin\Debug\netcoreapp3.1\prometheus.data.gym.dll</HintPath>
-    </Reference>
-
-   <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0"/>
-   <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0"/>   
-   <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0"/>
-   <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0"/>
+  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.5"/>   
+   <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.5"/>
+   <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.5"/>
    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.6.0"/>
    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0"/>
    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.2"/>
 
    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="4.0.1"/>
-   <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.0.0"/>
-   <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0"/>
-   <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0"/>
-   <PackageReference Include="System.Data.SQLite.Core" Version="*"/>
+
+   <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>

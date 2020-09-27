@@ -10,117 +10,149 @@ using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
 using System.Linq;
 
-// using QGym.API.Data.Security;
-// using QGym.API.DTO.Security;
-// using QGym.API.Model.Security;
 using prometheus.data.securitas;
 using prometheus.model.securitas;
 using prometheus.dto.securitas;
+using prometheus.data.gym;
+using prometheus.model.gym;
 // using SIQbic.API.Model.Enums;
 
-namespace QGym.API.Controllers // .Security
+namespace QGym.API.Controllers 
 {
     [Route("[controller]")]
     [ApiController]
     public class AuthController: ControllerBase
     {
         private readonly IAuthRepository _repo;
+        private readonly IGymRepository _repoGym;
         private readonly IConfiguration _config;
-        public AuthController(IAuthRepository repo, IConfiguration config)
+        public AuthController(IAuthRepository repo, IGymRepository repoGym, IConfiguration config)
         {
-            this._repo = repo;          
+            this._repo = repo;
+            this._repoGym = repoGym;
             this._config = config;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserForRegisterDTO userForRegisterDto)
         {
-            userForRegisterDto.UserName = userForRegisterDto.UserName.ToLower();
-
-            if (await this._repo.UserExists(userForRegisterDto.UserName))
+            try
             {
-                return BadRequest("This username already exists");
+                // Create as User
+                userForRegisterDto.UserName = userForRegisterDto.UserName.ToLower();
+
+                if (await this._repo.UserExists(userForRegisterDto.UserName))
+                {
+                    return BadRequest("Usuario previamente registrado."); // This username already exists
+                }
+
+                var memberRole = await this._repo.GetRoleByName("Miembro");
+                var userToCreate = new User
+                {
+                    UserName = userForRegisterDto.UserName,
+                    DisplayName = userForRegisterDto.DisplayName,
+                    Role = memberRole, // Miembro
+                    IsActive = true,
+                    CreationDate = DateTime.Now,
+                    LastModificationDate = DateTime.Now
+
+                };
+
+                var userCreated = await this._repo.Register(userToCreate, userForRegisterDto.Password);
+
+                // Create a Member
+                var userDb = await this._repoGym.GetUserById(userCreated.Id);
+                var memberToCreate = new Member() { User = userDb };
+                var memberCreated = await this._repoGym.Register(memberToCreate, "");
+
+                return StatusCode(201);
             }
-
-            var userToCreate = new User 
+            catch (Exception ex)
             {
-                UserName = userForRegisterDto.UserName,
-                DisplayName = userForRegisterDto.DisplayName,
-                // PhoneNumber = userForRegisterDto.Phone,
-                // QuestionResponses = new List<QuestionResponse>(),
-                // PhotoUrl = userForRegisterDto.PhotoUrl
-            };
+                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+            }
+        }
 
-            // var data = await this._repo.GetQuestions();
-            // var questions = data.ToList();
+        [HttpPut("register")]
+        public async Task<IActionResult> UpdatingImported(UserForUpdateRegisterDTO userForUpdateRegisterDto)
+        {
+            try
+            {
 
-            // var q1 = questions.FirstOrDefault(q => q.Id == Convert.ToInt32(userForRegisterDto.Question1.Split(":")[1].Trim()));
-            // var q2 = questions.FirstOrDefault(q => q.Id == Convert.ToInt32(userForRegisterDto.Question2.Split(":")[1]));
-            // var q3 = questions.FirstOrDefault(q => q.Id == Convert.ToInt32(userForRegisterDto.Question3.Split(":")[1]));
+                if (await this._repo.UserExists(userForUpdateRegisterDto.Email))
+                {
+                    return BadRequest("Usuario previamente registrado."); // This username already exists
+                }
 
-            // userToCreate.QuestionResponses.Add(new QuestionResponse {
-            //     Question = q1,
-            //     Response = userForRegisterDto.Response1
-            // });
-            // userToCreate.QuestionResponses.Add(new QuestionResponse {
-            //     Question = q2,
-            //     Response = userForRegisterDto.Response2
-            // });
-            // userToCreate.QuestionResponses.Add(new QuestionResponse {
-            //     Question = q3,
-            //     Response = userForRegisterDto.Response3
-            // });
+                await this._repo.UpdatingImported(userForUpdateRegisterDto.MemberId, userForUpdateRegisterDto.Email, userForUpdateRegisterDto.Password);
 
-            var userCreated = await this._repo.Register(userToCreate, userForRegisterDto.Password);
-
-            // await this._repo.UpdateRegisterCodeRecord(userForRegisterDto.RegistrationCode, RegistrationCodeStatusType.Activated.ToString(), userCreated.Id);
-
-            
-            return StatusCode(201);
+                return StatusCode(201);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+            }
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult>Login(UserForLoginDTO userForLoginDTO)
+        public async Task<IActionResult> Login(UserForLoginDTO userForLoginDTO)
         {
-            var userFromRepo = await _repo.Login(userForLoginDTO.UserName.ToLower(), userForLoginDTO.Password);
 
-            if (userFromRepo == null)
+            try
             {
-                return Unauthorized();
+                var userFromRepo = await _repo.Login(userForLoginDTO.UserName.ToLower(), userForLoginDTO.Password);
+
+                if (userFromRepo == null)
+                {
+                    return BadRequest("Credenciales Invalidas"); // Unauthorized();
+                }
+
+                if (!userFromRepo.IsActive)
+                    return BadRequest("Usuario Bloqueado, contacte al Administrador.");
+
+                var memberDb = await _repoGym.GetMember(userFromRepo.UserName, "");
+                // if (string.IsNullOrEmpty(userFromRepo.PhotoUrl))
+                // {
+                //     //TODO: This must be removed...
+                //     userFromRepo.PhotoUrl = "http://majahide-001-site1.itempurl.com/releasecandidates/PhotosManagerAPI/prometheusmedia/SIQBICPROFILES/UserProfiles/nopic.jpg";
+                // }
+                
+                
+                var claims = new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, memberDb.MemberId),
+                    new Claim(ClaimTypes.Email, userFromRepo.UserName),
+                    new Claim(ClaimTypes.Name, userFromRepo.DisplayName)
+                    // , new Claim(ClaimTypes.Webpage, userFromRepo.PhotoUrl)
+                };
+
+
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this._config.GetSection("AppSettings:Token").Value));
+
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(claims),
+                    //Expires = DateTime.Now.AddDays(1),
+                    SigningCredentials = creds
+                };
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+
+                return Ok(new
+                {
+                    token = tokenHandler.WriteToken(token),
+                    role = userFromRepo.Role.DisplayName,
+                    membershipExpiration = memberDb.MembershipExpiration,
+                    photoUrl = memberDb.PhotoUrl
+                });
+            } catch(Exception ex)
+            {
+                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
-
-            // if (string.IsNullOrEmpty(userFromRepo.PhotoUrl))
-            // {
-            //     //TODO: This must be removed...
-            //     userFromRepo.PhotoUrl = "http://majahide-001-site1.itempurl.com/releasecandidates/PhotosManagerAPI/prometheusmedia/SIQBICPROFILES/UserProfiles/nopic.jpg";
-            // }
-
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, userFromRepo.Id.ToString()),
-                new Claim(ClaimTypes.Name, userFromRepo.UserName),
-                new Claim(ClaimTypes.GivenName, userFromRepo.DisplayName)
-                // , new Claim(ClaimTypes.Webpage, userFromRepo.PhotoUrl)
-            };
-
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this._config.GetSection("AppSettings:Token").Value));
-
-            var creds =  new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var tokenDescriptor = new SecurityTokenDescriptor {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
-                SigningCredentials = creds
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            return Ok(new {
-                token = tokenHandler.WriteToken(token)
-            });
         }
 
         // [HttpGet("questions")]
@@ -159,6 +191,56 @@ namespace QGym.API.Controllers // .Security
             return Ok(new { msg = ""});
         }
 
+        [HttpPut("resetpassword")]
+        public async Task<ActionResult> ResetPassword(UserForResertPwdDTO userForResetPwd)
+        {
+            try
+            {
+                var result = await this._repo.ChangePassword(userForResetPwd.Email, userForResetPwd.OldPassword, userForResetPwd.NewPassword);
+
+                // await this._repo.SaveAll();
+                if (result)
+                    return Ok();
+                else
+                    return BadRequest("Credenciales Invalidas");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+            }
+        }
+
+        [HttpPost("confirmationCode")]
+        public async Task<IActionResult> ConfirmationCode(UserForConfirmationCodeDTO confirmationDto)
+        {
+            try
+            {
+                var memberDb = await this._repoGym.GetMember(confirmationDto.Email, confirmationDto.MemberId);
+
+                if (memberDb == null)
+                    return BadRequest("Usuario no encontrado");
+
+                // TODO: Esto esta provicional, Falta determinar los campos de validacion.
+                if (confirmationDto.Key == "Edad")
+                {
+                    if (confirmationDto.MemberId != confirmationDto.Value)
+                    {
+                        return BadRequest("Verificacion Invalida");
+                    }
+                }
+
+                var codeConfirm = this._repo.GenerateConfirmationCode();
+
+                // TODO: Envio de Correo.
+
+
+                return Ok(codeConfirm);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+            }
+        }
 
 
         public string CurrentPwd { get; set; }
@@ -206,6 +288,39 @@ namespace QGym.API.Controllers // .Security
             // }
 
             return Ok(result);
+        }
+
+        [HttpGet("member/{memberId}")]
+        public async Task<ActionResult> GetMembar(string memberId)
+        {
+            try
+            {
+                var memberDb = await this._repoGym.GetMember("", memberId);
+
+                var result = new MemberToValidateDTO();
+
+                result.DisplayName = memberDb.User.DisplayName;
+
+                result.Email = this._repo.ObfuscateEmail(memberDb.User.UserName);
+                if (string.IsNullOrEmpty(result.Email))
+                {
+                    var lst = await this._repoGym.GetValidationTypes();
+                    result.ValidationTypes = lst.Select(v => v.Name).ToList();
+                }
+                else
+                {
+                    result.ConfirmationCode = this._repo.GenerateConfirmationCode();
+                    // TODO: Mandar correo de confirmacion
+                }
+                
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+            }
+
         }
 
         // [HttpGet("onboard/{rcode}")]
@@ -272,7 +387,7 @@ namespace QGym.API.Controllers // .Security
         //     }
         //     else
         //     {
-               
+
         //         RegistrationCodeStatusType userRegCodeStatus = (RegistrationCodeStatusType) Enum.Parse(typeof(RegistrationCodeStatusType), regCode.Status);
 
         //         await this._repo.RequestInvitation(regCode.InvitedEmail, regCode.SponsorEmail, regCode.RoleId, regCode.InvitedName);

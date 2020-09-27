@@ -1,16 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-/*
-using Framework.DataTypes.Model.Base;
-using Framework.DataTypes.Model.Licenciamiento;
-using Framework.DataTypes.Model.Infraestructura;
-*/
 
-// using QGym.API.Model;
-
-// using QGym.API.Model.Security;
 using prometheus.model.gym;
-using prometheus.dto.gym;
-
 using prometheus.model.securitas;
 
 namespace prometheus.data.gym
@@ -19,10 +9,23 @@ namespace prometheus.data.gym
     {
         public DataContext(DbContextOptions<DataContext> options): base(options) {}
 
+        public DbSet<Member> Members { get; set; }
+        public DbSet<AuthorizedCapacity> AuthorizedCapacities { get; set; }
+        public DbSet<GeneralSettings> GeneralSettings { get; set; }
+        public DbSet<MembershipType> MembershipTypes { get; set; }
+        public DbSet<ValidationType> ValidationTypes { get; set; }
+
         public DbSet<User> Users { get; set; }
-        // public DbSet<Cliente> Clientes { get; set; }
-        // public DbSet<ClienteNegocio> ClienteNegocios { get; set; }
-        
-        
+        public DbSet<Role> Roles { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<User>().ToTable("Users", "securitas");
+            modelBuilder.Entity<Role>().ToTable("Roles", "securitas");
+        }
+
+
     }
 }

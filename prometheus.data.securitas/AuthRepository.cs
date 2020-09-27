@@ -1,35 +1,61 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-//using QGym.API.Model.Security;
 using prometheus.model.securitas;
+
+
 
 // using Model.Securitas;
 // using QGym.API.Model.Security.Enums;
 
 namespace prometheus.data.securitas
 {
-    public class AuthRepository: IAuthRepository
+    public class AuthRepository : IAuthRepository
     {
         // int EXPIRATION_DATE_VIGENCY = 5;
 
-        private readonly DataContext _context;
+        private readonly SecuritasDbContext _context;
 
-        public AuthRepository(DataContext context)
+        public AuthRepository(SecuritasDbContext context)
         {
             this._context = context;
         }
 
-        public Task<bool> ChangePassword(string username, string password, string newPassword)
+        public async Task<bool> ChangePassword(string username, string password, string newPassword)
         {
-            throw new System.NotImplementedException();
+            var userDb = await this._context.Users.FirstOrDefaultAsync(u => u.UserName == username);
+
+            if (!string.IsNullOrEmpty(password))
+            {
+                if (!VerifyPasswordHash(password, userDb.PasswordHash, userDb.PasswordSalt))
+                {
+                    return false;
+                }
+            }
+
+            byte[] passwordHash;
+            byte[] passwordSalt;
+
+            CreatePasswordHash(newPassword, out passwordHash, out passwordSalt);
+
+            userDb.PasswordHash = passwordHash;
+            userDb.PasswordSalt = passwordSalt;
+
+            
+            await this._context.SaveChangesAsync();
+
+            return true;
+
         }
 
         public async Task<User> Login(string username, string password)
         {
-            var user = await this._context.Users.FirstOrDefaultAsync(u => u.UserName == username);
+            var user = await this._context.Users
+                .Include(r => r.Role)
+                .FirstOrDefaultAsync(u => u.UserName == username);
 
             if (user == null)
             {
@@ -58,6 +84,27 @@ namespace prometheus.data.securitas
             await this._context.SaveChangesAsync();
 
             return user;
+        }
+
+        public async Task<bool> UpdatingImported(string memberId, string email, string password)
+        {
+            // En la Importacion se debe de poner el Numero de Membrecia en el User.UserName.
+            // En la Importacion se debe alimentar la info correspondiente en Memers
+            var user = await this._context.Users
+                .FirstOrDefaultAsync(u => u.UserName == memberId);
+
+            byte[] passwordHash;
+            byte[] passwordSalt;
+
+            CreatePasswordHash(password, out passwordHash, out passwordSalt);
+
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+
+            user.UserName = email;
+            await this._context.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<bool> UserExists(string username)
@@ -175,7 +222,56 @@ namespace prometheus.data.securitas
         //     return result;
         // }
 
-        private void CreatePasswordHash(string password,out byte[] passwordHash,out byte[] passwordSalt)
+        public string GenerateConfirmationCode()
+        {
+            string result = string.Empty;
+            DateTime rDate = DateTime.Now;
+
+            Random rnd = new Random(DateTime.Now.Second);
+            int fr1 = rnd.Next(0, 9);
+            int fr2 = rnd.Next(0, 9);
+            int fr3 = rnd.Next(0, 9);
+            int fr4 = rnd.Next(0, 9);
+
+            result = fr1.ToString()
+                + fr2.ToString()
+                + fr3.ToString()
+                + fr4.ToString();
+
+            return result;
+        }
+
+        public string ObfuscateEmail(string email)
+        {            
+            var result = string.Empty;
+
+            var parts = email.Split('@');
+
+            if(parts.Length == 1)
+                return result;
+
+            if(parts[0].Length >= 3)
+                result = parts[0].Substring(0, 3) + "*****@" + parts[1]; 
+            else
+                result = parts[0].Substring(0, 1) + "*****@" + parts[1];
+
+
+            return result;
+        }
+        public async Task<Role> GetRoleById(int id)
+        {
+            var role = await this._context.Roles.FirstOrDefaultAsync(r => r.Id == id);
+
+            return role;
+        }
+
+        public async Task<Role> GetRoleByName(string name)
+        {
+            var role = await this._context.Roles.FirstOrDefaultAsync(r => r.DisplayName == name);
+
+            return role;
+        }
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
 
             using (var hmac = new System.Security.Cryptography.HMACSHA512())
@@ -192,20 +288,21 @@ namespace prometheus.data.securitas
             {
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
 
-                for(int idx = 0; idx < computedHash.Length; idx++)
+                for (int idx = 0; idx < computedHash.Length; idx++)
                 {
                     if (computedHash[idx] != PasswordHash[idx]) return false;
                 }
-            } 
+            }
 
-            return true;      
+            return true;
         }
 
-        public async Task<bool> SaveAll() 
+        public async Task<bool> SaveAll()
         {
             return await this._context.SaveChangesAsync() > 0;
         }
 
-        
+
+
     }
 }

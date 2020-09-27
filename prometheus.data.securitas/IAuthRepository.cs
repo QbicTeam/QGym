@@ -11,6 +11,7 @@ namespace prometheus.data.securitas
     public interface IAuthRepository
     {
         Task<User> Register(User user, string password);
+        Task<bool> UpdatingImported(string memberId, string email, string password);
 
         Task<User> Login(string username, string password);
 
@@ -18,19 +19,14 @@ namespace prometheus.data.securitas
 
         Task<bool> ChangePassword(string username, string password, string newPassword);        
 
-        // Task<List<Question>> GetQuestions();
-
         Task<User> GetUserById(int userId);
+        
+        Task<Role> GetRoleByName(string name);
+        Task<Role> GetRoleById(int id);
 
-        // Task<string> RequestInvitation(string invetedEmail, string sponsorEmail, int roleId, string invitedName);
+        string GenerateConfirmationCode();
 
-        // Task<string> CreateInvitation(RegistrationCode code);
-
-        // Task<List<RegistrationCode>> GetInvitations();
-
-        // Task<RegistrationCode> GetInvitationById(int id);
-
-        // Task<bool> UpdateRegisterCodeRecord(string regCode, string status, int userId);
+        string ObfuscateEmail(string email);
 
         Task<bool> SaveAll();
     }
