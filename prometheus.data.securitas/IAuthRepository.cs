@@ -29,5 +29,8 @@ namespace prometheus.data.securitas
         string ObfuscateEmail(string email);
 
         Task<bool> SaveAll();
+
+
+
     }
 }

@@ -65,6 +65,65 @@ namespace prometheus.data.gym
             return await _context.ValidationTypes.ToListAsync();
         }
 
+        public async Task<IEnumerable<Member>> GetMembersToList()
+        {
+            return await _context.Members
+                .Include(u => u.User)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Member>> GetMembersType(string type)
+        {
+            if (type == "valid")
+            {
+                DateTime mtoday = DateTime.Today;
+
+                return await _context.Members
+                    .Include(u => u.User)
+                    .Where(m => m.MembershipExpiration >= DateTime.Today)
+                    .ToListAsync();
+
+            }
+
+            return await _context.Members
+                .Include(u => u.User)
+                .Where(u => u.User.IsActive == true)
+                .ToListAsync();
+
+        }
+        public async Task<IEnumerable<Member>> GetMembersForBlock()
+        {
+            return await _context.Members
+                .Include(u => u.User)
+                .ToListAsync();
+        }
+        
+        public async Task<Role> GetRoleByName(string roleName)
+        {
+            return await _context.Roles.FirstOrDefaultAsync(r => r.DisplayName == roleName);
+        }
+
+        public async Task<GeneralSettings> GetGeneralSettings()
+        {
+            return await _context.GeneralSettings.FirstOrDefaultAsync(g => g.Id == 1);
+        }
+
+        public async Task<IEnumerable<AuthorizedCapacity>> GetAuthorizedCapacityToList()
+        {
+            return await _context.AuthorizedCapacities.OrderByDescending(a => a.EndDate).ToListAsync();
+        }
+
+
+        public async Task<MembershipType> GetMembershipById(int id)
+        {
+            return await _context.MembershipTypes.FirstOrDefaultAsync(ms => ms.Id == id);
+        }
+
+        public async Task<IEnumerable<MembershipType>> GetPackages()
+        {
+            return await _context.MembershipTypes.OrderByDescending(m => m.PeriodicityDays).ThenBy(ms => ms.IsActive).ToListAsync();
+        }
+
         /*
         public async Task<IEnumerable<Cliente>> GetClientes()
         {

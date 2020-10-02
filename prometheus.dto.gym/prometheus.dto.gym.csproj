@@ -4,6 +4,6 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\prometheus.model.gym\prometheus.model.gym.csproj"/>
+    <ProjectReference Include="..\prometheus.model.gym\prometheus.model.gym.csproj" />
   </ItemGroup>
 </Project>
