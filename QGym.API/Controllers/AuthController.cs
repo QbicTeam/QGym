@@ -110,7 +110,7 @@ namespace QGym.API.Controllers
                 if (!userFromRepo.IsActive)
                     return BadRequest("Usuario Bloqueado, contacte al Administrador.");
 
-                var memberDb = await _repoGym.GetMember(userFromRepo.UserName, "");
+                var memberDb = await _repoGym.GetMember(userFromRepo.UserName, "", 0);
                 // if (string.IsNullOrEmpty(userFromRepo.PhotoUrl))
                 // {
                 //     //TODO: This must be removed...
@@ -215,7 +215,7 @@ namespace QGym.API.Controllers
         {
             try
             {
-                var memberDb = await this._repoGym.GetMember(confirmationDto.Email, confirmationDto.MemberId);
+                var memberDb = await this._repoGym.GetMember(confirmationDto.Email, confirmationDto.MemberId, 0);
 
                 if (memberDb == null)
                     return BadRequest("Usuario no encontrado");
@@ -295,7 +295,7 @@ namespace QGym.API.Controllers
         {
             try
             {
-                var memberDb = await this._repoGym.GetMember("", memberId);
+                var memberDb = await this._repoGym.GetMember("", memberId, 0);
 
                 var result = new MemberToValidateDTO();
 

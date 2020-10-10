@@ -6,5 +6,8 @@ namespace prometheus.model.gym
         public int TotalCapacity { get; set; }
         public int ScheduleChangeHours { get; set; }
         public int LoginAttempts { get; set; }
+        public string ScheduledWeek { get; set; }
+        public string CovidMsg { get; set; }
+        public int NotificationCapacity { get; set; }
     }
 }

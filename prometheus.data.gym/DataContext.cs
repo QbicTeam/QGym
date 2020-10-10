@@ -15,6 +15,8 @@ namespace prometheus.data.gym
         public DbSet<MembershipType> MembershipTypes { get; set; }
         public DbSet<ValidationType> ValidationTypes { get; set; }
 
+        public DbSet<UserScheduling> UserSchedulings { get; set; }
+
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
 

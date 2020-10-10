@@ -17,6 +17,7 @@ using prometheus.data.gym;
 using prometheus.model.gym;
 using AutoMapper;
 using prometheus.dto.gym.Membership;
+using prometheus.dto.gym.Packages;
 
 namespace QGym.API.Controllers
 {
@@ -73,7 +74,24 @@ namespace QGym.API.Controllers
             }
 
         }
+        [HttpGet("actives")]
+        public async Task<ActionResult> GetActivesPackages()
+        {
+            try
+            {
 
+                var packages = await _repo.GetActivePackages();
+                var result = _mapper.Map<List<MembershipType>, List<ActivePackageDTO>>(packages.ToList());
+                
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+            }
+
+        }
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdatingPackages([FromBody] MembershipTypeForCreateDTO packageRq, int id)
         {

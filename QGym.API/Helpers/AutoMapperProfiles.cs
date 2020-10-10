@@ -11,6 +11,8 @@ using prometheus.dto.gym;
 using prometheus.dto.gym.Members;
 using prometheus.dto.gym.Capacity;
 using prometheus.dto.gym.Membership;
+using prometheus.dto.gym.Admin;
+using prometheus.dto.gym.Packages;
 
 namespace QGym.API.Helpers
 {
@@ -49,7 +51,7 @@ namespace QGym.API.Helpers
                 .ForMember(dest => dest.Email, opt => {
                     opt.MapFrom(src => src.User.UserName);
                 })
-                .ForMember(dest => dest.DisplayName, opt => {
+                .ForMember(dest => dest.FullName, opt => {
                     opt.MapFrom(src => src.User.DisplayName);
                 });
 
@@ -60,7 +62,7 @@ namespace QGym.API.Helpers
                 .ForMember(dest => dest.IsBlock, opt => {
                     opt.MapFrom(src => !src.User.IsActive);
                 })
-                .ForMember(dest => dest.DisplayName, opt => {
+                .ForMember(dest => dest.FullName, opt => {
                     opt.MapFrom(src => src.User.DisplayName);
                 });
 
@@ -71,7 +73,7 @@ namespace QGym.API.Helpers
                 .ForMember(dest => dest.IsBlock, opt => {
                     opt.MapFrom(src => !src.User.IsActive);
                 })
-                .ForMember(dest => dest.DisplayName, opt => {
+                .ForMember(dest => dest.FullName, opt => {
                     opt.MapFrom(src => src.User.DisplayName);
                 })
                 .ForMember(dest => dest.CreationDate, opt => {
@@ -83,16 +85,38 @@ namespace QGym.API.Helpers
                 .ForMember(dest => dest.RoleName, opt => {
                     opt.MapFrom(src => src.User.Role.DisplayName);
                 });
+            
+            CreateMap<Member, MembersDetailsDTO>()
+                .ForMember(dest => dest.Email, opt => {
+                    opt.MapFrom(src => src.User.UserName);
+                })
+                .ForMember(dest => dest.FullName, opt => {
+                    opt.MapFrom(src => src.User.DisplayName);
+                })
+                .ForMember(dest => dest.Package, opt => {
+                    opt.MapFrom(src => src.MembershipTypeActive.Name);
+                })
+                .ForMember(dest => dest.Period, opt => {
+                    opt.MapFrom(src => (src.MembershipExpiration - DateTime.Today).TotalDays.ToString("N0") + " Días");
+                })
+                .ForMember(dest => dest.DueDate, opt => {
+                    opt.MapFrom(src => src.MembershipExpiration);
+                });
 
             CreateMap<AuthorizedCapacity, AuthorizedCapacityDTO>();
             CreateMap<AuthorizedCapacityForCreateDTO, AuthorizedCapacity>();
 
             CreateMap<MembershipType, MembershipTypeDTO>();
             CreateMap<MembershipType, MembershipTypeFullDTO>();
-            CreateMap<MembershipTypeForCreateDTO, MembershipType>(); 
+            CreateMap<MembershipTypeForCreateDTO, MembershipType>();
+
+            CreateMap<MembershipType, ActivePackageDTO>()
+                .ForMember(dest => dest.Period, opt => {
+                    opt.MapFrom(src => src.PeriodicityDays.ToString() + " Días");
+                });
 
 
         }
-        
+
     }
 }

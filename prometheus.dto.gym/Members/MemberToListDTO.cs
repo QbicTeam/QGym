@@ -7,7 +7,7 @@ namespace prometheus.dto.gym.Members
     public class MemberToListDTO
     {
         public string MemberId { get; set; }
-        public string DisplayName { get; set; }
+        public string FullName { get; set; } // fullName  - Anterior: DisplayName
         public string Email { get; set; }
         public string PhotoUrl { get; set; }
 

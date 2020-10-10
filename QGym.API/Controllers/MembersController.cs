@@ -17,6 +17,8 @@ using prometheus.data.gym;
 using prometheus.model.gym;
 using AutoMapper;
 using prometheus.dto.gym.Members;
+using prometheus.dto.gym.Admin;
+using Newtonsoft.Json;
 
 namespace QGym.API.Controllers
 {
@@ -84,7 +86,7 @@ namespace QGym.API.Controllers
         {
             try
             {
-                var dataDb = await this._repo.GetMember("", memberId);
+                var dataDb = await this._repo.GetMember(null, memberId, 0);
 
                 var result = _mapper.Map<MemberForBlockDTO>(dataDb);
 
@@ -103,7 +105,7 @@ namespace QGym.API.Controllers
         {
             try
             {
-                var dataDb = await this._repo.GetMember("", memberId);
+                var dataDb = await this._repo.GetMember(null, memberId, 0);
 
                 var result = _mapper.Map<MemberDTO>(dataDb);
 
@@ -122,7 +124,7 @@ namespace QGym.API.Controllers
             try
             {
 
-                var user = await this._repo.GetMember("", memberId);
+                var user = await this._repo.GetMember(null, memberId, 0);
 
                 user.User.IsActive = isBlock == 1? false : true;
 
@@ -141,7 +143,7 @@ namespace QGym.API.Controllers
         {
             try
             {
-                var memberDb = await this._repo.GetMember("", memberId);
+                var memberDb = await this._repo.GetMember(null, memberId, 0);
 
 
                 if(!string.IsNullOrEmpty(member.MemberId) && string.IsNullOrEmpty(memberDb.MemberId))
@@ -168,8 +170,8 @@ namespace QGym.API.Controllers
                 if (!string.IsNullOrEmpty(member.Email))
                     memberDb.User.UserName = member.Email;
 
-                if (!string.IsNullOrEmpty(member.DisplayName))
-                    memberDb.User.DisplayName = member.DisplayName;
+                if (!string.IsNullOrEmpty(member.FullName))
+                    memberDb.User.DisplayName = member.FullName;
 
                 if (!string.IsNullOrEmpty(member.RoleName) && member.RoleName != memberDb.User.Role.DisplayName)
                 {
@@ -198,7 +200,228 @@ namespace QGym.API.Controllers
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
         }
+        [HttpGet("{userId}/schedule/summary")]
+        public async Task<ActionResult> ScheduleSummary(int userId)
+        {
+            var resutl = new List<ScheduleSumaryDTO>();
 
+            try
+            {
+                var memberDb = await this._repo.GetMember(null, null, userId);
+
+                if (memberDb == null)
+                    return BadRequest("Socio no encontrado.");
+
+                if (!memberDb.User.IsActive)
+                    return BadRequest("Socio Bloqueado.");
+
+                
+                var settings = await this._repo.GetGeneralSettings();
+                var scheduleSettings = JsonConvert.DeserializeObject<List<ScheduleDaySettings>>(settings.ScheduledWeek);
+                var scheduleUserDb = await this._repo.GetUserBookedSummary(userId);
+
+                foreach(UserScheduling s in scheduleUserDb)
+                {
+                    var sday = new ScheduleSumaryDTO() { Date = s.Schedule };
+                    var ss = scheduleSettings.First(stt => stt.Day.ToLower() == s.Schedule.ToString("dddd").ToLower());
+                    var sh = ss.RangeDates.First(h => h.StarHour == s.Schedule.ToString("HH:mm"));
+                    sday.BookedHour = string.Format("{0} - {1}", sh.StarHour, sh.EndHour);
+                    resutl.Add(sday);
+                }
+
+                return Ok(resutl);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+            }
+        }
+
+        [HttpGet("{userId}/schedule/{day}")]
+        public async Task<ActionResult> ScheduleDay(int userId, string day)
+        {
+            var resutl = new ScheduleDayDTO() { SelectableHours = new List<HoursData>() };
+            try
+            {
+                // Day debe de estar enformato YYYYMMDD
+                if (day.Length != 8)
+                    return BadRequest("Formato de Fecha Incorrecto. (YYYYMMDD)");
+
+                var y = Convert.ToInt32(day.Substring(0, 4));
+                var m = Convert.ToInt32(day.Substring(4, 2));
+                var d = Convert.ToInt32(day.Substring(6));
+
+                if ( y < 2020 || m > 12 || d > 31)
+                    return BadRequest("Fecha incorrecta.");
+
+                var date = new DateTime(y, m, d);
+
+                var memberDb = await this._repo.GetMember(null, null, userId);
+
+                if (memberDb == null)
+                    return BadRequest("Socio no encontrado.");
+
+                if (!memberDb.User.IsActive)
+                    return BadRequest("Socio Bloqueado.");
+
+
+                var settings = await this._repo.GetGeneralSettings();
+                var scheduleSettings = JsonConvert.DeserializeObject<List<ScheduleDaySettings>>(settings.ScheduledWeek);
+                var userBookedDay = this._repo.GetUserBookedDay(memberDb.User.Id, date);
+                var scheduledDay = this._repo.GetBookedDay(date);
+                var currentAuthorizedCapacity = this._repo.GetCurrentAuthorizedCapacity(date);
+
+                resutl.Date = date;
+                var ss = scheduleSettings.First(stt => stt.Day.ToLower() == date.ToString("dddd").ToLower());
+                
+                foreach (HoursRange hr in ss.RangeDates)
+                {
+                    var hd = new HoursData();
+
+                    hd.Range = string.Format("{0} - {1}", hr.StarHour, hr.EndHour);
+
+                    var time = hr.StarHour.Split(':');
+                    var bookedTime = new DateTime(date.Year, date.Month, date.Day, Convert.ToInt32(time[0]), Convert.ToInt32(time[1]), 0);
+
+                    var sdh = scheduledDay.FirstOrDefault(d => d.Schedule == bookedTime);
+                    if (sdh != null)
+                    {
+                        var availability = currentAuthorizedCapacity.Result - sdh.Count;
+                        if (availability < settings.NotificationCapacity)
+                            hd.Capacity = availability.ToString();
+                        
+                        if (userBookedDay != null && hr.StarHour == userBookedDay.Schedule.ToString("HH:mm"))
+                            hd.Booked = true;
+                    }
+                    
+                    resutl.SelectableHours.Add(hd);
+                }
+
+                return Ok(resutl);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+            }
+        }
+        [HttpPost("{userId}/schedule")]
+        public async Task<IActionResult> Reserving([FromBody] ReserveTimeDTO reserveData, int userId)
+        {
+            try
+            {
+                var memberDb = await this._repo.GetMember(null, null, userId);
+                if (memberDb == null)
+                    return BadRequest("Socio no encontrado.");
+
+                if (!memberDb.User.IsActive)
+                    return BadRequest("Socio Bloqueado.");
+
+                var settings = await this._repo.GetGeneralSettings();
+                var time = reserveData.Hour.Split(':');
+                var reserveTime = new DateTime(reserveData.Date.Year, reserveData.Date.Month, reserveData.Date.Day, Convert.ToInt32(time[0]), Convert.ToInt32(time[1]), 0);
+
+                if (reserveTime > memberDb.MembershipExpiration)
+                    return BadRequest("Membrecia Vencida.");
+
+                if (reserveTime < DateTime.Now)
+                    return BadRequest("La reservación no puede ser en el pasado");
+
+                var minTimeToReserve = DateTime.Now.AddHours(settings.ScheduleChangeHours);
+
+                if (reserveTime < minTimeToReserve)
+                    return BadRequest("Se debe reservar con " + settings.ScheduleChangeHours.ToString() + " horas de anticipación");
+
+                var scheduleSettings = JsonConvert.DeserializeObject<List<ScheduleDaySettings>>(settings.ScheduledWeek);
+
+                var foundHour = false;
+                for (int s = 0; s < scheduleSettings.Count; s++)
+                {
+                    if (scheduleSettings[s].Day.ToLower() == reserveTime.ToString("dddd").ToLower())
+                    {
+                        for (int h = 0; h < scheduleSettings[s].RangeDates.Count; h++)
+                        {
+                            if (scheduleSettings[s].RangeDates[h].StarHour == reserveData.Hour)
+                            {
+                                foundHour = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!foundHour)
+                    return BadRequest("Horario de reservación invalido");
+
+
+                var authorizedCapacity = await this._repo.GetCurrentAuthorizedCapacity(reserveTime);
+                var currentOccupation = this._repo.GetCurrentOccupationHour(reserveTime);
+
+                if (authorizedCapacity <= currentOccupation)
+                    return BadRequest("Horario saturado, Favor de seleccionar otra hora.");
+
+                var userBookedDay = this._repo.GetUserBookedDay(memberDb.User.Id, reserveTime);
+
+                var newBooked = new UserScheduling() { Schedule = reserveTime, User = memberDb.User, IsAttended = false };
+
+                this._repo.Add(newBooked);
+                if (userBookedDay != null) // (userBookedDay.Result != null)
+                    this._repo.Remove(userBookedDay);
+
+                // Validar vigencia?
+                // Validar Bloqueo?
+                
+                // Y Validar el Usuario
+                // Y Validar el tiempo permitido para hacer cambios
+                // Y Validar que la fecha no sea menor a hoy
+                // Y Validar que la Hora de reserva se encuentre en la configuracion.
+                // Y Validar la disponibilidad
+                // hacer la reservacion
+                // Si tiene reservacion para ese mismo dia, eliminarla.
+                // Regresar la disponibilidad del dia?
+
+
+
+                await this._repo.SaveAll();
+
+                return Ok();
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+            }
+        }
+
+        [HttpDelete("{userId}/schedule")]
+        public async Task<IActionResult> Removing([FromBody] ReserveTimeDTO reserveData, int userId)
+        {
+            try
+            {
+                var memberDb = await this._repo.GetMember(null, null, userId);
+                if (memberDb == null)
+                    return BadRequest("Socio no encontrado.");
+
+
+                var time = reserveData.Hour.Split(':');
+                var reserveTime = new DateTime(reserveData.Date.Year, reserveData.Date.Month, reserveData.Date.Day, Convert.ToInt32(time[0]), Convert.ToInt32(time[1]), 0);
+
+                var userBookedDay = this._repo.GetUserBookedDay(memberDb.User.Id, reserveTime);
+
+                if (userBookedDay != null)
+                    this._repo.Remove(userBookedDay);
+
+                await this._repo.SaveAll();
+
+                return Ok();
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+            }
+        }
 
 
 

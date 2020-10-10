@@ -5,19 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\prometheus.model.gym\prometheus.model.gym.csproj"/>
-    <ProjectReference Include="..\prometheus.dto.gym\prometheus.dto.gym.csproj"/>
+    <ProjectReference Include="..\prometheus.model.gym\prometheus.model.gym.csproj" />
+    <ProjectReference Include="..\prometheus.dto.gym\prometheus.dto.gym.csproj" />
 
     <ProjectReference Include="..\prometheus.model.securitas\prometheus.model.securitas.csproj" />
 
-   <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.5"/>   
-   <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.5"/>
-   <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.5"/>
-   <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.6.0"/>
-   <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0"/>
-   <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.2"/>
+   <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.5" />   
+   <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.5" />
+   <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.5" />
+   <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.6.0" />
+   <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+   <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0" />
+   <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.2" />
 
-   <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="4.0.1"/>
+   <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="4.0.1" />
 
    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>

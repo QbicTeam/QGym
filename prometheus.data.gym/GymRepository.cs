@@ -28,6 +28,10 @@ namespace prometheus.data.gym
             _context.Add(entity);
         }
 
+        public void Remove<T>(T entity) where T : class
+        {
+            _context.Remove(entity);
+        }
         public async Task<bool> SaveAll()
         {
             return await _context.SaveChangesAsync() > 0;
@@ -45,11 +49,11 @@ namespace prometheus.data.gym
 
             return member;
         }
-        public async Task<Member> GetMember(string email, string memberId)
+        public async Task<Member> GetMember(string email, string memberId, int userId)
         {
            var cliente = await _context.Members
             .Include(u => u.User).ThenInclude(r => r.Role)
-            .FirstOrDefaultAsync(m => m.User.UserName == email || m.MemberId == memberId);
+            .FirstOrDefaultAsync(m => m.User.UserName == email || m.MemberId == memberId || m.User.Id == userId);
 
             return cliente;
         }
@@ -97,7 +101,24 @@ namespace prometheus.data.gym
                 .Include(u => u.User)
                 .ToListAsync();
         }
-        
+        public async Task<IEnumerable<Member>> GetMembersBookedInHour(DateTime bookedTime)
+        {
+            return await _context.Members
+                .Include(u => u.User)
+                .Include(p => p.MembershipTypeActive)
+                .Where(s => _context.UserSchedulings.Where(us => us.Schedule == bookedTime).Select(us => us.UserId).Contains(s.User.Id))
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<Member>> GetMembersElegibles(DateTime day)
+        {
+            return await _context.Members
+                .Include(u => u.User)
+                .Include(p => p.MembershipTypeActive)
+                .Where(m => m.MembershipExpiration > day && m.User.IsActive)
+                .ToListAsync();
+        }
+
+
         public async Task<Role> GetRoleByName(string roleName)
         {
             return await _context.Roles.FirstOrDefaultAsync(r => r.DisplayName == roleName);
@@ -113,6 +134,70 @@ namespace prometheus.data.gym
             return await _context.AuthorizedCapacities.OrderByDescending(a => a.EndDate).ToListAsync();
         }
 
+        public async Task<int> GetCurrentAuthorizedCapacity(DateTime date)
+        {
+            var capacity = await _context.AuthorizedCapacities
+                .Where(ac => ac.StartDate <= date && ac.EndDate >= date )
+                .Select(f => f.Capacity)
+                .FirstOrDefaultAsync();
+
+            if (capacity != null && capacity > 0)
+                return capacity;
+
+            var dateEndMax = _context.AuthorizedCapacities
+                .Where(ac => ac.EndDate <= date)
+                .Select(ed => ed.EndDate)
+                .Max();
+
+            capacity = await _context.AuthorizedCapacities
+                .Where(ac => ac.EndDate == dateEndMax)
+                .Select(f => f.Capacity)
+                .FirstOrDefaultAsync();
+
+            return capacity;
+        }
+
+        public int GetCurrentOccupationHour(DateTime date)
+        {
+            var occupation = _context.UserSchedulings
+                .Where(us => us.Schedule == date)                
+                .Count();
+
+            return occupation;
+        }
+
+        public UserScheduling GetUserBookedDay(int userId, DateTime date)
+        {
+            var ds = new DateTime(date.Year, date.Month, date.Day);
+            var de = ds.AddDays(1);
+            var scheduled = _context.UserSchedulings 
+                .Where(s => s.User.Id == userId && s.Schedule >= ds && s.Schedule < de)
+                .FirstOrDefault();
+            return scheduled;
+        }
+        public async Task<IEnumerable<UserScheduling>> GetUserBookedSummary(int userId)
+        {
+            return await _context.UserSchedulings
+                .Where(s => s.User.Id == userId && s.Schedule >= DateTime.Today)
+                .OrderBy(s => s.Schedule)
+                .ToListAsync();
+        }
+        /// <summary>
+        /// Regresa la cantidad de reservaciones por rango de horas en el dia 
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public IEnumerable<Scheduled> GetBookedDay(DateTime date)
+        {
+            var ds = new DateTime(date.Year, date.Month, date.Day);
+            var de = ds.AddDays(1);
+            var result = _context.UserSchedulings
+                    .Where(us => us.Schedule >= ds && us.Schedule < de)
+                    .GroupBy(s => s.Schedule)                    
+                    .Select(g => new Scheduled { Schedule = g.Key, Count = g.Count() })
+                    .OrderBy(u => u.Schedule);
+            return result;
+        }
 
         public async Task<MembershipType> GetMembershipById(int id)
         {
@@ -123,7 +208,10 @@ namespace prometheus.data.gym
         {
             return await _context.MembershipTypes.OrderByDescending(m => m.PeriodicityDays).ThenBy(ms => ms.IsActive).ToListAsync();
         }
-
+        public async Task<IEnumerable<MembershipType>> GetActivePackages()
+        {
+            return await _context.MembershipTypes.Where(p => p.IsActive).OrderByDescending(m => m.PeriodicityDays).ToListAsync();
+        }
         /*
         public async Task<IEnumerable<Cliente>> GetClientes()
         {

@@ -10,7 +10,7 @@ namespace prometheus.dto.gym.Members
         public int Id { get; set; }
         //-- User
         public string Email { get; set; }
-        public string DisplayName { get; set; }
+        public string FullName { get; set; } // fullName  - Anterior: DisplayName
         public bool IsBlock { get; set; } // IsActive
         public DateTime CreationDate { get; set; }
         public DateTime? LastModificationDate { get; set; }
