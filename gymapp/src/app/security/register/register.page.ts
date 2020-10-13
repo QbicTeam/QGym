@@ -1,6 +1,9 @@
+import { ThrowStmt } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastController } from '@ionic/angular';
+import { SecurityService } from 'src/app/api/security.service';
 
 @Component({
   selector: 'app-register',
@@ -9,6 +12,7 @@ import { Router } from '@angular/router';
 })
 export class RegisterPage implements OnInit {
 
+  isLoading = false;
   memberConfirmed = false;
   confirmationCodeSent = false;
   confirmationCode = '';
@@ -30,15 +34,24 @@ export class RegisterPage implements OnInit {
   }, { validator: this.passwordMatchValidator});
 
 
-  constructor(private formBuilder: FormBuilder, private router: Router) { }
+  constructor(private formBuilder: FormBuilder, private router: Router,
+              private securityService: SecurityService) { }
 
   ngOnInit() {
   }
 
   onSendConfirmationCode() {
-    this.confirmationCodeSent = true;
-    this.confirmationCodeForm.patchValue({confirmationCodeSent : 12345 });
-    console.log(this.confirmationCodeForm.value);
+
+    this.isLoading = true;
+
+    this.securityService.getConfirmationCodeForRegister(this.registerForm.value.email).subscribe(response => {
+
+      this.confirmationCodeSent = true;
+      this.confirmationCodeForm.patchValue({confirmationCodeSent : response });
+      this.isLoading = false;
+
+    });
+
   }
 
   onVerified() {
@@ -54,6 +67,23 @@ export class RegisterPage implements OnInit {
   }
 
   onRegister() {
-    this.router.navigate(['/schedule']);
+
+    this.isLoading = true;
+
+    this.securityService.register(this.registerForm.value.email,
+                                  this.registerForm.value.fullName,
+                                  this.passwordForm.value.password).subscribe(response => {
+
+        this.securityService.login(this.registerForm.value.email,
+                                    this.passwordForm.value.password).subscribe(resLogin => {
+
+          // TODO: Esto debe ponerse el localstorage.
+          this.isLoading = false;
+          this.router.navigate(['/packages']);
+
+        });
+
+    });
   }
+
 }

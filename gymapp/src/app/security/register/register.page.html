@@ -43,7 +43,7 @@
 
           <!-- <div linespace></div> -->
 
-          <ion-button *ngIf="!confirmationCodeSent" [disabled]="registerForm.invalid" (click)="onSendConfirmationCode()" color="gym-primary" class="ion-button-class" shape="round" fill="solid" expand="block">Continuar</ion-button>
+          <ion-button *ngIf="!confirmationCodeSent" [disabled]="registerForm.invalid && !isLoading" (click)="onSendConfirmationCode()" color="gym-primary" class="ion-button-class" shape="round" fill="solid" expand="block">Continuar</ion-button>
 
         </form>
 
@@ -59,7 +59,7 @@
                   EN CASO DE NO RECIBIR DICHO CODIGO, SOLICITAR EL REENVIO DE CONFIRMACION
                 </p>
                 <p class="resendButton">
-                  <ion-button (click)="onSendConfirmationCode()" color="gym-secondary" class="ion-button-class" shape="round" fill="solid">Reenviar Confirmacion</ion-button>
+                  <ion-button (click)="onSendConfirmationCode()" [disabled]="registerForm.invalid && !isLoading" color="gym-secondary" class="ion-button-class" shape="round" fill="solid">Reenviar Confirmacion</ion-button>
                 </p>
               </ion-card-content>
             </ion-card>
@@ -81,7 +81,8 @@
 
           <div linespace></div>
 
-          <ion-button (click)="onVerified()" [disabled]="confirmationCodeForm.invalid" color="gym-primary" class="ion-button-class" shape="round" fill="solid" expand="block">Validar</ion-button>
+
+          <ion-button (click)="onVerified()" [disabled]="confirmationCodeForm.invalid && !isLoading" color="gym-primary" class="ion-button-class" shape="round" fill="solid" expand="block">Validar</ion-button>
 
           </div>
         </form>
@@ -127,7 +128,7 @@
 
             <div linespace></div>
         
-            <ion-button [disabled]="passwordForm.invalid" color="gym-primary" class="ion-button-class" shape="round" fill="solid" size="large" (click)="onRegister();" expand="block">Registrarse</ion-button>
+            <ion-button [disabled]="passwordForm.invalid && !isLoading" color="gym-primary" class="ion-button-class" shape="round" fill="solid" size="large" (click)="onRegister();" expand="block">Registrarse</ion-button>
 
           </div>
           
