@@ -1,0 +1,16 @@
+[transparent] {
+    --background: transparent;
+}
+
+ion-item {
+    --highlight-color-focused: transparent;
+    --highlight-height: 0;
+    --highlight-color-invalid:#000;
+    --highlight-color-valid:#ddd;
+    --main-height: 65px;
+    --padding-start: 0;
+}
+
+ion-card {
+    margin: 0;
+}

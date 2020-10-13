@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Bloqueo de usuario</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">
+        Cerrar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+
+<ion-list>
+  <ion-item class="item ios in-list ion-focusable hydrated item-label">
+    <ion-avatar slot="start" class="ios hydrated">
+      <img src="{{photoUrl}}">
+    </ion-avatar>
+    <ion-label class="sc-ion-label-ios-h sc-ion-label-ios-s ios hydrated">
+      <h2>{{memberId}}</h2>
+      <h3>{{fullName}}</h3>
+      <p>{{email}}</p>
+    </ion-label>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Razon del bloqueo</ion-label>
+    <ion-input [(ngModel)]="reason" placeholder="Describa la razon por la cual se esta bloqueando el usuario" type="text"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-toggle [(ngModel)]="isBlocked" [disabled]="!isBlocked && !reason"></ion-toggle>
+  </ion-item>
+
+</ion-list>
+
+</ion-content>

@@ -1,0 +1,139 @@
+.login-header {
+    background-color: var(--theme-color);
+}
+
+.login-header {
+    border-top: solid 5px var(--theme-red);
+    position: relative;
+    background-color: var(--theme-white);
+    border-radius: 0em;
+}
+
+.login-header:after {
+    content: '';
+    position: absolute;
+    bottom: solid;
+    left: 15%;
+    width: 0;
+    height: 0;
+    border: 30px solid transparent;
+    border-top-color: var(--theme-white);
+    border-bottom: 0;
+    margin-left: -15px;
+    margin-bottom: -15px;
+}
+
+.logo-img {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+}
+
+[heading-colum-lr] {
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+}
+
+[big-heading] {
+    font-family: "Montserrat" !important;
+    font-weight: bold;
+    font-size: 30px !important;
+    color: var(--theme-black);
+
+}
+
+[small-heading] {
+    font-family: "Montserrat" !important;
+    font-weight: bold;
+    margin-left: auto;
+    padding-right: 40px;
+    font-size: 15px;
+}
+
+ion-label {
+    color:#000;
+    opacity: .8;
+    font-size: 13px;
+    display: block;
+}
+
+ion-content {
+    --background: url('../../../assets/images/background.jpg');
+}
+
+[transparent] {
+    --background: transparent;
+}
+
+ion-card-content {
+    padding:0;
+}
+
+
+// =============================
+
+/*
+.container {
+    position: relative;
+    text-align: center;
+    color: #000;
+  }
+*/
+
+/* Bottom left text */
+/*
+.title {
+    position: absolute;
+    bottom: 40px;
+    left: 16px;
+    font-size: 38px;
+    font-weight: 700;
+    font-family: "Montserrat";
+  }
+
+  .subtitle {
+    position: absolute;
+    bottom: 100px;
+    left: 16px;
+    font-size: 30px;
+    font-weight: 500;
+    font-family: "Montserrat";
+  }
+
+  p {
+      margin-bottom: 10px;
+  }
+
+
+  .login-header {
+    background-color: var(--theme-black);
+}
+
+.login-header {
+    border-top: solid 5px var(--theme-red);
+    position: relative;
+    background-color: var(--theme-black);
+    border-radius: 0em;
+}
+
+.login-header:after {
+    content: '';
+    position: absolute;
+    bottom: solid;
+    left: 15%;
+    width: 0;
+    height: 0;
+    border: 30px solid transparent;
+    border-top-color: var(--theme-black);
+    border-bottom: 0;
+    margin-left: -15px;
+    margin-bottom: -15px;
+}
+
+.logo-img {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+}
+*/

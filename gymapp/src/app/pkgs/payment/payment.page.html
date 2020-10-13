@@ -1,0 +1,98 @@
+<ion-header no-border>
+  <div class="login-header ion-padding">
+    <img src="../../assets/images/logo.png" alt="" class="logo-img">
+  </div>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+
+        <ion-card>
+          <ion-item>
+            <ion-label>Acceso Total</ion-label>
+            <ion-label>Plan Mensual</ion-label>
+            <ion-label slot="end">
+              <h1>$ 500.00</h1>
+            </ion-label>
+          </ion-item>
+        </ion-card>
+        
+
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>
+        <img style="height: 48px; margin-right:5px;" src="https://w7.pngwing.com/pngs/92/785/png-transparent-mastercard-logo-mastercard-credit-card-payment-visa-nyse-ma-mastercard-logo-text-logo-sign.png"/>
+        <img style="height: 48px; margin-right:5px;" src="https://www.bankdealguy.com/wp-content/uploads/2018/09/Discover.jpg"/>
+        <img style="height: 48px; margin-right:5px;" src="https://upload.wikimedia.org/wikipedia/commons/1/16/Former_Visa_%28company%29_logo.svg"/>
+        <img style="height: 48px; margin-right:5px;" src="https://cdn.worldvectorlogo.com/logos/amex-card.svg"/>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label position="floating">Numero de Tarjeta:</ion-label>
+          <ion-input></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label position="floating">Nombre complete:</ion-label>
+          <ion-input></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col size="12">
+        <ion-item lines="none">
+          <label>Fecha de Vencimiento:</label>
+        </ion-item>
+      </ion-col>
+
+      <ion-col>
+        <ion-item>
+          <ion-label position="floating">Mes:</ion-label>
+          <ion-input></ion-input>
+        </ion-item>
+      </ion-col>
+      <ion-col>
+        <ion-item>
+          <ion-label position="floating">Año:</ion-label>
+          <ion-input></ion-input>
+        </ion-item>
+      </ion-col>
+      <ion-col>
+        <ion-item>
+          <ion-label position="floating">CVV:</ion-label>
+          <ion-input></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item lines="none">
+          <ion-label class="sc-ion-label-ios-h sc-ion-label-ios-s ios hydrated" id="ion-cb-8-lbl">
+            <small>
+              He leido y acepto la <a href="#">Politica de Privacidad</a>
+            </small>
+          </ion-label>
+          <ion-checkbox color="primary" checked="" slot="start" role="checkbox" aria-checked="false" aria-labelledby="ion-cb-8-lbl" class="ion-color ion-color-primary ios in-item checkbox-checked interactive hydrated"><input type="hidden" class="aux-input" name="ion-cb-8" value="off"></ion-checkbox>
+        </ion-item>        
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col class="ion-text-end">
+        <ion-button color="gym-primary" [routerLink]="['/', 'payment']">Pagar</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+
+</ion-content>

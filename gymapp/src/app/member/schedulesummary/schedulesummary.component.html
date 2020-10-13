@@ -1,0 +1,34 @@
+<ion-card color="medium">
+  <ion-card-header>
+    <ion-card-subtitle>{{memberSchedule[0].date | date:'MMM dd, yyyy'}} - 
+      {{memberSchedule[memberSchedule.length-1].date | date:'MMM dd, yyyy'}}</ion-card-subtitle>
+    <ion-item transparent lines="none">
+        <ion-card-title slot="start">Mi Horario</ion-card-title>
+        <ion-button color="light" (click)="onCollapse()" slot="end" >
+          <ion-icon *ngIf="!scheduleCollapsed" name="arrow-down-circle-outline"></ion-icon>
+          <ion-icon *ngIf="scheduleCollapsed" name="arrow-up-circle-outline"></ion-icon>  
+        </ion-button>
+    </ion-item>
+  </ion-card-header>
+
+  <ion-card-content *ngIf="scheduleCollapsed">
+    <ion-list>
+      <div *ngFor="let itm of memberSchedule">
+      <ion-item *ngIf="itm.bookedHour" color="none" lines="none" transparent>
+          <ion-label slot="start">
+            <h2>{{getFormmattedDate(itm.date)}}</h2>
+          </ion-label>
+          <ion-chip color="gym-primary" class="chip-outline" slot="end">
+            {{itm.bookedHour}}
+          </ion-chip>
+      </ion-item>
+    </div>
+    </ion-list>
+
+    <ion-item transparent lines="none">
+      <ion-label>No volver a mostrar</ion-label>
+      <ion-checkbox slot="end"></ion-checkbox>  
+    </ion-item>
+
+  </ion-card-content>
+</ion-card>

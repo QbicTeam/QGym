@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Configuracion del Sistema</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-segment [(ngModel)]="currentView">
+    <ion-segment-button value="block">
+      <ion-icon name="close-circle-outline"></ion-icon>
+      <ion-label>Bloqueo</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="ocupation">
+      <ion-icon name="color-fill-outline"></ion-icon>
+      <ion-label>Ocupacion</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="schedule">
+      <ion-icon name="alarm-outline"></ion-icon>
+      <ion-label>Horarios</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="users">
+      <ion-icon name="people-outline"></ion-icon>
+      <ion-label>Usuarios</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="packages">
+      <ion-icon name="albums-outline"></ion-icon>
+      <ion-label>Membresias</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <app-blockusers *ngIf="currentView === 'block'"></app-blockusers>
+  <app-capacity *ngIf="currentView === 'ocupation'"></app-capacity>
+  <app-schedule *ngIf="currentView === 'schedule'"></app-schedule>
+  <app-users *ngIf="currentView === 'users'"></app-users>
+  <app-gympackages *ngIf="currentView === 'packages'"></app-gympackages>
+
+        
+</ion-content>

@@ -1,0 +1,17 @@
+
+<ion-searchbar animated (ionChange)='searchMember($event)' showCancelButton="always"></ion-searchbar>
+
+<ion-list>
+  <ion-item button (click)="openModal(itm)" *ngFor="let itm of dataSearched" class="item ios in-list ion-focusable hydrated item-label">
+    <ion-avatar slot="start" class="ios hydrated">
+      <img src="{{itm.photoUrl}}">
+    </ion-avatar>
+    <ion-label class="sc-ion-label-ios-h sc-ion-label-ios-s ios hydrated">
+      <h2>{{itm.memberId}}</h2>
+      <h3>{{itm.fullName}}</h3>
+      <p>{{itm.email}}</p>
+    </ion-label>
+  </ion-item>
+
+</ion-list>
+

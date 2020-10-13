@@ -1,0 +1,159 @@
+<ion-header no-border>
+  <div class="login-header ion-padding">
+    <img src="../../assets/images/logo.png" alt="" class="logo-img">
+  </div>
+</ion-header>
+
+<ion-content>
+
+  
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size-xs="12" size-sm="8" offset-sm="2" size-md="6" offset-md="3" size-lg="4" offset-lg="4" size-xl="6" offset-xl="3">
+        
+        
+
+          <div heading-colum-lr>
+            <h1 big-heading>Soy Socio</h1>
+          </div>
+      
+          <form [formGroup]="memberForm">
+
+            <ion-item transparent>
+              <ion-icon color="gym-primary" name="barcode-outline"></ion-icon>
+              <ion-input formControlName="memberId" placeholder="Numero de Socio (membresia)" type="text"></ion-input>
+            </ion-item>
+
+            <div class="invalid-feedback" *ngIf="memberForm.get('memberId').hasError('required') 
+              && memberForm.get('memberId').touched">
+              <p>* El No. de socio es requerido.</p>
+            </div>
+    
+            <ion-button [disabled]="memberForm.invalid" (click)="onValidateMember()" color="gym-primary" class="ion-button-class" shape="round" fill="solid" size="small" expand="block">Validar Socio</ion-button>
+
+          </form>
+
+          <ion-item *ngIf="memberName" transparent lines="none">
+            <ion-label class="welcome">Bienvenido <strong>{{memberName}}</strong></ion-label>
+          </ion-item>
+
+          <div *ngIf="memberFound && optionsSelection.length > 0">
+
+          <ion-card *ngIf="!memberEmail">            
+            <ion-card-content>
+              <p>
+              Necesitamos validar su identidad asi que seleccione una de las opciones posible y capture su respuesta.
+              </p>
+            </ion-card-content>
+          </ion-card>
+
+          <ion-item transparent *ngIf="!memberEmail">
+            <ion-label color="gym-primary">Opciones: </ion-label>
+            <ion-select [(ngModel)]="selectedOption" placeholder="Seleccionar Opcion">
+              <ion-select-option *ngFor="let opt of optionsSelection" selected="true" [value]="opt">{{opt}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <form [formGroup]="identityForm">
+
+            <ion-item transparent *ngIf="!memberEmail">
+              <ion-icon color="gym-primary" name="list-circle-outline"></ion-icon>
+              <ion-input formControlName="response" placeholder="Capture su respuesta" type="text"></ion-input>
+            </ion-item>
+
+            <ion-item transparent>
+              <ion-icon color="gym-primary" name="mail-open-outline"></ion-icon>
+              <ion-input formControlName="email" placeholder="Correo Electronico" type="text"></ion-input>
+            </ion-item>
+            
+            <ion-button *ngIf="!memberEmail" [disabled]="identityForm.invalid" (click)="onIdentityConfirmation()" color="gym-primary" class="ion-button-class" shape="round" fill="solid" size="small" expand="block">Validar Respuesta</ion-button>
+
+          </form>
+          
+        </div>
+
+          <div *ngIf="memberFound && memberEmail">
+
+          <ion-card>            
+            <ion-card-content>
+              <p>
+              Hemos enviado a tu correo <strong class="emailConfirmationCode">majah**********@hotmail.com</strong> un CODIGO DE CONFIRMACION, anotalo en el recuadro siguiente:
+              </p>
+              <p class="resendCode">
+                EN CASO DE NO RECIBIR DICHO CODIGO, SOLICITAR EL REENVIO DE CONFIRMACION
+              </p>
+              <p class="resendButton">
+                <ion-button color="gym-secondary" class="ion-button-class" shape="round" fill="solid">Reenviar Confirmacion</ion-button>
+              </p>
+            </ion-card-content>
+          </ion-card>
+
+          <form [formGroup]="confirmationCodeForm">
+
+            <ion-item transparent>
+              <ion-icon color="gym-primary" name="swap-horizontal-outline"></ion-icon>
+              <ion-input formControlName="confirmationCode" placeholder="Codigo de Confirmacion" type="number"></ion-input>
+            </ion-item>
+
+            <div class="invalid-feedback" *ngIf="confirmationCodeForm.get('confirmationCode').hasError('required') 
+            && confirmationCodeForm.get('confirmationCode').touched">
+              <p>* El codigo de confirmacion es requerido.</p>
+            </div>
+  
+            <div class="invalid-feedback" *ngIf="confirmationCodeForm.hasError('mismatchCode') 
+              && confirmationCodeForm.get('confirmationCode').touched">
+              <p>* El codigo de confirmacion no es correcto.</p>
+            </div>
+
+            <ion-item transparent>
+              <ion-icon color="gym-primary" name="lock-closed-outline"></ion-icon>
+              <ion-input formControlName="password" type="password" placeholder="Clave de Acceso"></ion-input>
+            </ion-item>
+
+            <div class="invalid-feedback" *ngIf="confirmationCodeForm.get('password').hasError('required') 
+            && confirmationCodeForm.get('password').touched">
+              <p>* La clave de acceso es requerida.</p>
+            </div>
+
+            <div class="invalid-feedback" *ngIf="confirmationCodeForm.get('password').hasError('minlength') 
+              && confirmationCodeForm.get('password').touched">
+              <p>* La clave de acceso debe contener al menos 4 caracteres.</p>
+            </div>
+
+            <div class="invalid-feedback" *ngIf="confirmationCodeForm.get('password').hasError('maxlength') 
+              && confirmationCodeForm.get('password').touched">
+              <p>* La clave de acceso no debe exeder los 8 caracteres</p>
+            </div>
+
+            <ion-item transparent>
+              <ion-icon color="gym-primary" name="lock-closed-outline"></ion-icon>
+              <ion-input formControlName="confirmPassword" type="password" placeholder="Confirmacion Clave de Acceso"></ion-input>
+            </ion-item>
+
+            <div class="invalid-feedback" *ngIf="confirmationCodeForm.get('confirmPassword').hasError('required') 
+              && confirmationCodeForm.get('confirmPassword').touched">
+              <p>* La clave de acceso es requerida</p>
+            </div>
+
+            <div class="invalid-feedback" *ngIf="confirmationCodeForm.hasError('mismatch') 
+              && confirmationCodeForm.get('confirmPassword').touched">
+              <p>* Las claves de acceso no coinciden</p>
+            </div>
+
+
+            <div linespace></div>
+        
+            <ion-button [disabled]="confirmationCodeForm.invalid" color="gym-primary" class="ion-button-class" shape="round" fill="solid" size="large" expand="block" (click)="onRegisterMember()">Confirmar Registro</ion-button>
+          
+          </form>
+
+        </div>
+        
+      
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>
