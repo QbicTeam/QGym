@@ -1,0 +1,61 @@
+
+<ion-grid>
+  <ion-row>
+    <ion-col>
+
+      <p>
+        NOTA: La capacidad establecida equivale al 100% de ocupacion.
+      </p>
+
+      <ion-item transparent>
+        <ion-label position="floating">Capacidad</ion-label>
+        <ion-input [(ngModel)]="totalCapacity" placeholder="Capacidad" type="text"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block">Grabar</ion-button>
+
+    </ion-col>
+  </ion-row>
+</ion-grid>
+
+<ion-list>
+  
+  <ion-list-header class="ios hydrated">
+    Capacidad Autorizada
+  </ion-list-header>
+
+  <ion-item *ngFor="let itm of data" class="item ios in-list ion-focusable hydrated item-label">
+    <ion-label class="sc-ion-label-ios-h sc-ion-label-ios-s ios hydrated">
+      <h2>
+        <ion-chip>{{itm.startDate}}</ion-chip>
+        <ion-chip>Nov.20.2020</ion-chip>
+        <ion-chip>10 dias restantes</ion-chip>
+      </h2>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-icon slot="start" name="pulse-outline"></ion-icon>
+              <ion-label>50%</ion-label>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-icon slot="start" name="people-outline"></ion-icon>
+              <ion-label>100 Usuarios</ion-label>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-label>
+  </ion-item>
+
+</ion-list>
+
+
+  <!-- fab placed to the bottom end -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="onAddNewCapacity()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>

@@ -1,0 +1,70 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Administracion de usuarios</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">
+        Cerrar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-list>
+    <ion-item>
+
+        <label for="files" class="selectImage">Seleccionar Foto</label>
+        <input id="files" style="display:none;" type="file">
+
+    </ion-item>
+    <ion-item>
+      <!-- <ion-thumbnail>
+        <img src="https://i.pinimg.com/564x/33/39/fc/3339fca84ea04f3623285d1bfc6be410.jpg">
+      </ion-thumbnail> -->
+
+      <img src="https://i.pinimg.com/564x/33/39/fc/3339fca84ea04f3623285d1bfc6be410.jpg">
+
+    </ion-item>
+    <ion-item transparent>
+        <ion-label position="floating">No. Socio</ion-label>
+        <ion-input placeholder="Introducir el numero de socio" type="text"></ion-input>
+    </ion-item>
+    <ion-item transparent>
+      <ion-label position="floating">Nombre</ion-label>
+      <ion-input placeholder="Nombre completo" type="text"></ion-input>
+   </ion-item>
+   <ion-item transparent>
+      <ion-label position="floating">Correo Electronico</ion-label>
+      <ion-input placeholder="Capturar un correo electronico" type="text"></ion-input>
+   </ion-item>
+
+   <ion-list-header class="ios hydrated">
+    Datos Generales
+   </ion-list-header>
+
+   <ion-item transparent>
+      <ion-label position="floating">Telefono:</ion-label>
+      <ion-input placeholder="Capturar un numero telefonico" type="text"></ion-input>
+   </ion-item>
+
+  <ion-item>
+    <ion-label>F. Nacimiento</ion-label>
+    <ion-datetime displayFormat="MM DD YY" placeholder="Seleccionar"></ion-datetime>
+  </ion-item>
+
+  <ion-item transparent>
+    <ion-label>Paquetes: </ion-label>
+    <ion-select placeholder="Seleccionar Opcion">
+      <ion-select-option>Familiar</ion-select-option>
+      <ion-select-option>Estudiante</ion-select-option>
+      <ion-select-option>Femenil</ion-select-option>
+      <ion-select-option>Normal</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+
+  </ion-list>
+  <ion-button expand="block" fill="outline">Grabar</ion-button>
+
+</ion-content>

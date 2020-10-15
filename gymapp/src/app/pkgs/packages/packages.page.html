@@ -1,0 +1,46 @@
+<ion-header no-border>
+  <div class="login-header ion-padding">
+    <img src="../../assets/images/logo.png" alt="" class="logo-img">
+  </div>
+</ion-header>
+
+
+<ion-content>
+
+  <ion-grid>
+    <ion-row>
+
+      <ion-col *ngFor="let itm of data" size-xs="12" size-lg="6" >
+        <ion-card class="padding" class="ios hydrated">         
+          
+          <ion-card-content>
+
+            <div [innerHTML]="itm.shortDescription">
+            </div>
+            <ion-grid>
+              <ion-row>
+                <ion-col>
+                  <h1>{{itm.price | currency}}</h1>
+                </ion-col>
+                <ion-col>
+                  <ion-chip color="success">{{itm.period}}</ion-chip>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <ion-button [routerLink]="['/', 'payment']" expand="block" color="gym-primary">Comprar</ion-button>
+                </ion-col>
+                <ion-col>
+                  <ion-button [routerLink]="['/', 'package-detail']" expand="block" color="medium">Ver Detalles</ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+
+          </ion-card-content>
+        </ion-card>        
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+</ion-content> 

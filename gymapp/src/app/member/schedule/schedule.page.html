@@ -1,0 +1,117 @@
+<ion-header no-border>
+  <!-- <div class="login-header ion-padding"> -->
+    <ion-item transparent lines="none">
+      <ion-menu-button color="gym-primary" autoHide="false" menu="gymmenu" slot="start"></ion-menu-button>
+      <img src="../../assets/images/logo.png" alt="" class="logo-img">  
+    </ion-item>
+  <!-- </div> -->
+</ion-header>
+
+<ion-menu side="start" menuId="gymmenu" contentId="main">
+  <ion-header>
+    <ion-toolbar color="primary">
+      <img src="../../../assets/images/logo-footer.png"/>
+    </ion-toolbar>
+
+    <ion-card class="ios hydrated">
+      <img style="height: 100px;" src="https://theskincareedit.com/.image/t_share/MTU2ODk4NDM4MDIyODk5MTQ5/mila-kunis-young-hollywood-awards-2000.jpg">
+      <ion-card-header class="ion-inherit-color ios hydrated">
+        <ion-card-subtitle role="heading" aria-level="3" class="ion-inherit-color ios hydrated">Vencimiento: Nov 3, 2020</ion-card-subtitle>
+        <ion-card-title role="heading" aria-level="2" class="ion-inherit-color ios hydrated">Mila Kunis</ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="ios card-content-ios hydrated">
+        <ion-item lines="none">
+          <ion-label>123456</ion-label>
+          <ion-label>Lady Fitness</ion-label>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+  </ion-header>
+  <ion-content>
+    <ion-list>
+      <ion-item button (click)="onMyProfile()">
+        <ion-icon slot="start" name="person-circle-outline"></ion-icon>
+        Mi Perfil
+      </ion-item>
+      <ion-item button (click)="onSelectedOption('packages')">
+        <ion-icon slot="start" name="albums-outline"></ion-icon>
+        Paquetes
+      </ion-item>
+      <ion-item button (click)="onSelectedOption('schedule')">
+        <ion-icon slot="start" name="alarm-outline"></ion-icon>
+        Agenda
+      </ion-item>
+      <ion-item button (click)="onSelectedOption('frontdesk')">
+        <ion-icon slot="start" name="alarm-outline"></ion-icon>
+        Mostrador
+      </ion-item>
+      <ion-item button (click)="onSelectedOption('admin')">
+        <ion-icon slot="start" name="cog-outline"></ion-icon>
+        Administrador
+      </ion-item>
+      <ion-item button (click)="onSelectedOption('sales')">
+        <ion-icon slot="start" name="cash-outline"></ion-icon>
+        Reporte de Ventas
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+
+<ion-content id="main">
+
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size-xs='12' size-sm='6'>
+        <app-covidalert></app-covidalert>
+      </ion-col>
+      <ion-col size-xs='12' size-sm='6'>
+        <app-schedulesummary [memberSchedule]="memberSchedule"></app-schedulesummary>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="memberSchedule[0].bookedHour">
+      <ion-col>
+        <ion-button (click)="showReservation()" expand="block" size="small">
+          <ion-icon slot="start" name="alarm-outline"></ion-icon>
+          Mi Reservacion: {{memberSchedule[0].bookedHour}}
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+
+
+
+  <ion-segment scrollable="true" [(ngModel)]="currentDay">
+    <ion-segment-button (click)="goto(idx)" *ngFor="let itm of memberSchedule; let idx = index" value="{{idx}}">
+      <h2>{{itm.date.getDate()}}</h2>
+      <ion-label>{{getDisplayMonth(itm.date.getMonth())}}</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <ion-slides [options]="sliderConfig" #slides (ionSlideDidChange)="getIndex($event)">
+
+    <ion-slide *ngFor="let d of memberSchedule; let sidx = index" data-id={{sidx}}>
+        <ion-card class="scheduleCard">        
+          <ion-card-header>
+            <h3>{{d.date | date:'MMM dd, yyyy'}}</h3>
+          </ion-card-header>
+          <ion-card-content class="ion-no-padding">
+            <ion-list>
+              <ion-item color="trasparent" *ngFor="let itm of d.selectableHours" lines="none" class="item ios in-list ion-focusable hydrated item-label">
+                <ion-label slot="start" class="sc-ion-label-ios-h sc-ion-label-ios-s ios hydrated">
+                  <h2>{{itm.range}}</h2>
+                </ion-label>
+                <ion-badge *ngIf="itm.capacity && itm.capacity > 74 && itm.capacity < 100" color="gym-primary">{{itm.capacity}} %</ion-badge>
+                <!-- <ion-icon *ngIf="itm.capacity && itm.capacity > 74 && itm.capacity < 100" color="danger" name="warning-outline"></ion-icon> -->
+                <ion-toggle [(ngModel)]="itm.booked" *ngIf="!itm.capacity || itm.capacity !== 100" color="gym-primary" slot="end"></ion-toggle>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>        
+      </ion-slide>
+
+  </ion-slides>
+</ion-content>

@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Check In</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">
+        Cerrar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+
+<ion-content class="ion-padding">
+
+  <ion-grid style="background-color: white;">
+    <ion-row>
+      <ion-col>
+        <ion-card color="danger">
+          <ion-card-content>
+
+            <ion-grid>
+              <ion-row>
+                <ion-col size="4">
+                    <!-- <img src="https://i.pinimg.com/564x/33/39/fc/3339fca84ea04f3623285d1bfc6be410.jpg"> -->
+                    <img src="https://cache.desktopnexus.com/thumbseg/1326/1326713-bigthumbnail.jpg"/>
+                </ion-col>
+                <ion-col>
+                  <div>
+                      <h2>12345</h2>
+                      <div>Ago 20, 2020</div>
+                      <div><strong>09:00 - 10:00</strong></div>
+                    </div>      
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                    <h1>Full Member Name</h1>
+                    <p>member@gmail.com</p>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <!-- <ion-col>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"/>
+      </ion-col> -->
+    </ion-row>
+    <ion-row>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"/>
+    </ion-row>
+  </ion-grid>

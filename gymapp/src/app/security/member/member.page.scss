@@ -1,0 +1,136 @@
+.login-header {
+    background-color: var(--theme-color);
+}
+
+.login-header {
+    border-top: solid 5px var(--theme-red);
+    position: relative;
+    background-color: var(--theme-white);
+    border-radius: 0em;
+}
+
+.login-header:after {
+    content: '';
+    position: absolute;
+    bottom: solid;
+    left: 15%;
+    width: 0;
+    height: 0;
+    border: 30px solid transparent;
+    border-top-color: var(--theme-white);
+    border-bottom: 0;
+    margin-left: -15px;
+    margin-bottom: -15px;
+}
+
+.logo-img {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+}
+
+[heading-colum-lr] {
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+}
+
+[big-heading] {
+    font-family: "Montserrat" !important;
+    font-weight: bold;
+    font-size: 30px !important;
+    color: var(--theme-black);
+
+}
+
+[small-heading] {
+    font-family: "Montserrat" !important;
+    font-weight: bold;
+    margin-left: auto;
+    padding-right: 40px;
+    font-size: 15px;
+}
+
+ion-label {
+    color:#000;
+    opacity: .8;
+    font-size: 13px;
+    display: block;
+}
+
+ion-content {
+    --background: url('../../../assets/images/background.jpg');
+}
+
+[transparent] {
+    --background: transparent;
+}
+
+ion-input {
+    --color:#000;
+    --padding-bottom: 15px;
+    --padding-top: 15px;
+    --padding-start: 5px;
+    font-size: 15px;
+    text-indent: 1px;
+    padding-left: 10px !important;
+}
+
+ion-item {
+    --highlight-color-focused: transparent;
+    --highlight-height: 0;
+    --highlight-color-invalid:#000;
+    --highlight-color-valid:#ddd;
+    --main-height: 65px;
+    --padding-start: 0;
+}
+
+[linespace] {
+    height: 30px;
+}
+
+ion-label {
+    color:#000;
+    opacity: .8;
+    font-size: 13px;
+    display: block;
+}
+
+ion-card p {
+    font-size: 10px;
+}
+
+.resendCode {
+    margin-top: 8px;
+    text-align: center;
+}
+
+.emailConfirmationCode {
+    color: var(--theme-white);
+}
+
+.welcome {
+    color: var(--theme-black);
+}
+
+.resendButton {
+    text-align: center;
+}
+
+
+ion-select {
+    /* Applies to the value and placeholder color */
+    color: #000;
+  
+    /* Set a different placeholder color */
+    --placeholder-color: #971e49;
+  
+    /* Set full opacity on the placeholder */
+    --placeholder-opacity: 1;
+  }
+
+  .invalid-feedback p {
+    color:red;
+    font-weight: bold;
+    font-size: 10px;
+}

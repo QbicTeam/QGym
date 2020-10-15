@@ -1,0 +1,22 @@
+<ion-header no-border>
+  <div class="login-header ion-padding">
+    <img src="../../assets/images/logo.png" alt="" class="logo-img">
+  </div>
+</ion-header>
+
+
+
+<ion-content padding>
+
+  <div [innerHTML]="data">
+  </div>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-button [routerLink]="['/', 'payment']" expand="block" color="gym-primary">Comprar membresia</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>

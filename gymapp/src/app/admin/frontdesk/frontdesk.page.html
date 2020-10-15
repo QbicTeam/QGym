@@ -1,0 +1,81 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Mostrador</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- <ion-segment [(ngModel)]="currentView">
+    <ion-segment-button value="block">
+      <ion-icon name="construct-outline"></ion-icon>
+      <ion-label>Asignacion</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="ocupation">
+      <ion-icon name="file-tray-full-outline"></ion-icon>
+      <ion-label>Reporte de Ocupacion</ion-label>
+    </ion-segment-button>
+  </ion-segment> -->
+
+<!-- 
+  <ion-searchbar animated (ionChange)='searchMember($event)' showCancelButton="always"></ion-searchbar>
+
+  <ion-list>
+    <ion-item button *ngFor="let itm of dataSearched" class="item ios in-list ion-focusable hydrated item-label">
+      <ion-avatar slot="start" class="ios hydrated">
+        <img src="{{itm.photoUrl}}">
+      </ion-avatar>
+      <ion-label class="sc-ion-label-ios-h sc-ion-label-ios-s ios hydrated">
+        <h2>{{itm.memberId}}</h2>
+        <h3>{{itm.fullName}}</h3>
+        <p>{{itm.email}}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+   -->
+
+  <ion-segment scrollable="true" [(ngModel)]="currentDay">
+    <ion-segment-button (click)="goto(idx)" *ngFor="let itm of generalSchedule; let idx = index" value="{{idx}}">
+      <h2>{{itm.date.getDate()}}</h2>
+      <ion-label>{{getDisplayMonth(itm.date.getMonth())}}</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+
+  <ion-slides [options]="sliderConfig" #slides (ionSlideDidChange)="getIndex($event)">
+
+    <ion-slide *ngFor="let d of generalSchedule; let sidx = index" data-id={{sidx}}>
+        <ion-card class="scheduleCard">        
+          <ion-card-header>
+            <h3>{{d.date | date:'MMM dd, yyyy'}}</h3>
+          </ion-card-header>
+          <ion-card-content class="ion-no-padding">
+            <ion-list>
+              <ion-item lines="none">
+                <ion-label slot="start">
+                  <strong>Horario</strong>
+                </ion-label>
+                <ion-label>
+                  <strong>Disponibilidad</strong>
+                </ion-label>
+              </ion-item>
+              <ion-item *ngFor="let itm of d.selectableHours" lines="none" class="item ios in-list ion-focusable hydrated item-label">
+                <ion-label slot="start" class="sc-ion-label-ios-h sc-ion-label-ios-s ios hydrated">
+                  <h2>{{itm.range}}</h2>
+                </ion-label>
+                <ion-badge color="{{getColor(itm.capPercentaje)}}">{{itm.capPercentaje}}% / {{itm.capPeople}}</ion-badge>
+                <!-- <ion-icon *ngIf="itm.capacity && itm.capacity > 74 && itm.capacity < 100" color="danger" name="warning-outline"></ion-icon> -->
+                <ion-button [routerLink]="['/frontdeskmanager']" *ngIf="getAvailability(d.date, itm.range)" slot="end">
+                  <ion-icon name="construct-outline"></ion-icon>
+                </ion-button>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>        
+      </ion-slide>
+
+  </ion-slides>
+
+
+
+</ion-content>

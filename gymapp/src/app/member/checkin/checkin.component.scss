@@ -1,0 +1,34 @@
+[transparent] {
+    --background: transparent;
+}
+
+ion-item {
+    --highlight-color-focused: transparent;
+    --highlight-height: 0;
+    --highlight-color-invalid:#000;
+    --highlight-color-valid:#ddd;
+    --main-height: 65px;
+    --padding-start: 0;
+}
+
+[linespace] {
+    height: 30px;
+}
+
+ion-label {
+    color:#000;
+    opacity: .8;
+    font-size: 13px;
+    display: block;
+}
+
+
+ion-list {
+    background-color: transparent;
+}
+
+ion-item {
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+}
