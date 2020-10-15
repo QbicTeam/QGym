@@ -36,15 +36,17 @@ namespace QGym.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-        //    services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
-        //        .ConfigureWarnings(w => w.Ignore(CoreEventId.IncludeIgnoredWarning)));
+            //    services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
+            //        .ConfigureWarnings(w => w.Ignore(CoreEventId.IncludeIgnoredWarning)));
 
-           services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("LocalConnectionSQLServer")));
-            // .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning)));
-           services.AddDbContext<SecuritasDbContext>(x => x.UseSqlServer(Configuration.GetConnectionString("LocalConnectionSQLServer")));
+            //services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("LocalConnectionSQLServer")));
+            // // .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning)));
+            //services.AddDbContext<SecuritasDbContext>(x => x.UseSqlServer(Configuration.GetConnectionString("LocalConnectionSQLServer")));
+            services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionRemoteSQLServer")));
+            services.AddDbContext<SecuritasDbContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionRemoteSQLServer")));
 
 
-           services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
            services.AddCors();
            services.AddAutoMapper();
 

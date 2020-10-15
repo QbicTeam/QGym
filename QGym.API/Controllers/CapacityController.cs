@@ -17,6 +17,8 @@ using prometheus.data.gym;
 using prometheus.model.gym;
 using AutoMapper;
 using prometheus.dto.gym.Capacity;
+using System.Reflection;
+using QGym.API.Helpers;
 
 namespace QGym.API.Controllers
 {
@@ -53,6 +55,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "N/A", ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
 
@@ -72,6 +75,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "N/A", ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
 
@@ -94,6 +98,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, totalCapacity, ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
         }
@@ -125,6 +130,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, autCapacity, ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
         }

@@ -16,6 +16,8 @@ using prometheus.dto.securitas;
 using prometheus.data.gym;
 using prometheus.model.gym;
 using AutoMapper;
+using System.Reflection;
+using QGym.API.Helpers;
 
 namespace QGym.API.Controllers
 {
@@ -47,6 +49,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "N/A", ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
 
@@ -70,6 +73,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, hours, ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
         }

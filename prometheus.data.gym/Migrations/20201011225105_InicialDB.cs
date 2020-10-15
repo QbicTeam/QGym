@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace prometheus.data.gym.Migrations
 {
-    public partial class InitialCreateGym : Migration
+    public partial class InicialDB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -34,7 +34,10 @@ namespace prometheus.data.gym.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TotalCapacity = table.Column<int>(nullable: false),
                     ScheduleChangeHours = table.Column<int>(nullable: false),
-                    LoginAttempts = table.Column<int>(nullable: false)
+                    LoginAttempts = table.Column<int>(nullable: false),
+                    ScheduledWeek = table.Column<string>(nullable: true),
+                    CovidMsg = table.Column<string>(nullable: true),
+                    NotificationCapacity = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -58,6 +61,19 @@ namespace prometheus.data.gym.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MembershipTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ValidationTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ValidationTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -134,6 +150,28 @@ namespace prometheus.data.gym.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "UserSchedulings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(nullable: false),
+                    Schedule = table.Column<DateTime>(nullable: false),
+                    IsAttended = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserSchedulings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserSchedulings_Users_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "securitas",
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Members_MembershipTypeActiveId",
                 table: "Members",
@@ -142,6 +180,11 @@ namespace prometheus.data.gym.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Members_UserId",
                 table: "Members",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSchedulings_UserId",
+                table: "UserSchedulings",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -161,6 +204,12 @@ namespace prometheus.data.gym.Migrations
 
             migrationBuilder.DropTable(
                 name: "Members");
+
+            migrationBuilder.DropTable(
+                name: "UserSchedulings");
+
+            migrationBuilder.DropTable(
+                name: "ValidationTypes");
 
             migrationBuilder.DropTable(
                 name: "MembershipTypes");

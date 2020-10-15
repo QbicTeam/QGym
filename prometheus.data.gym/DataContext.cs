@@ -7,7 +7,10 @@ namespace prometheus.data.gym
 {
     public class DataContext: DbContext
     {
-        public DataContext(DbContextOptions<DataContext> options): base(options) {}
+        public DataContext(DbContextOptions<DataContext> options): base(options) {
+            //Disable initializer
+            //Database.EnsureCreated(); // .SetInitializer<DataContext>(null);
+        }
 
         public DbSet<Member> Members { get; set; }
         public DbSet<AuthorizedCapacity> AuthorizedCapacities { get; set; }
@@ -16,6 +19,8 @@ namespace prometheus.data.gym
         public DbSet<ValidationType> ValidationTypes { get; set; }
 
         public DbSet<UserScheduling> UserSchedulings { get; set; }
+
+        // public DbSet<PaymentTransLog> PaymentTrans { get; set; }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }

@@ -19,6 +19,8 @@ using AutoMapper;
 using prometheus.dto.gym.Members;
 using prometheus.dto.gym.Admin;
 using Newtonsoft.Json;
+using System.Reflection;
+using QGym.API.Helpers;
 
 namespace QGym.API.Controllers
 {
@@ -53,6 +55,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "N/A", ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
 
@@ -76,6 +79,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, type, ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
 
@@ -95,6 +99,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, memberId, ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
 
@@ -113,6 +118,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, memberId, ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
 
@@ -134,6 +140,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, memberId + ", IsBlock:" + isBlock.ToString(), ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
         }
@@ -197,6 +204,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, member, ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
         }
@@ -234,6 +242,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, userId, ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
         }
@@ -303,6 +312,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "UserId: " + userId.ToString() + ", day: " + day , ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
         }
@@ -390,6 +400,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, reserveData, ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
         }
@@ -419,6 +430,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, reserveData, ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
         }

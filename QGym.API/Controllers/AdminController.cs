@@ -1,5 +1,4 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 
 using System.Collections.Generic;
 using System.Linq;
+
+using System.Net.Http;
 
 using prometheus.data.securitas;
 using prometheus.model.securitas;
@@ -20,6 +21,10 @@ using prometheus.dto.gym.Capacity;
 using Newtonsoft.Json;
 using prometheus.dto.gym.Admin;
 using prometheus.dto.gym.Members;
+using System.Net.Http.Headers;
+using System;
+using QGym.API.Helpers;
+using System.Reflection;
 
 namespace QGym.API.Controllers
 {
@@ -65,6 +70,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, field, ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
 
@@ -96,6 +102,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "N/A", ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
 
@@ -149,42 +156,51 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, day, ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
         }
         [HttpGet("schedule/{datetime}/capacity")]
         public async Task<ActionResult> CapacityInHour(string datetime)
         {
-            var result = new CapacityInHourDTO();
+            try
+            {
+                var result = new CapacityInHourDTO();
 
-            // datetime debe de estar enformato YYYYMMDD-HHmm
-            if (datetime.Length != 13)
-                return BadRequest("Formato de Fecha Incorrecto. (YYYYMMDD-HHmm)");
+                // datetime debe de estar enformato YYYYMMDD-HHmm
+                if (datetime.Length != 13)
+                    return BadRequest("Formato de Fecha Incorrecto. (YYYYMMDD-HHmm)");
 
-            var y = Convert.ToInt32(datetime.Substring(0, 4));
-            var m = Convert.ToInt32(datetime.Substring(4, 2));
-            var d = Convert.ToInt32(datetime.Substring(6,2));
+                var y = Convert.ToInt32(datetime.Substring(0, 4));
+                var m = Convert.ToInt32(datetime.Substring(4, 2));
+                var d = Convert.ToInt32(datetime.Substring(6, 2));
 
-            if (y < 2020 || m > 12 || d > 31)
-                return BadRequest("Fecha incorrecta.");
+                if (y < 2020 || m > 12 || d > 31)
+                    return BadRequest("Fecha incorrecta.");
 
-            var HH = Convert.ToInt32(datetime.Substring(9, 2));
-            var mm = Convert.ToInt32(datetime.Substring(11));
+                var HH = Convert.ToInt32(datetime.Substring(9, 2));
+                var mm = Convert.ToInt32(datetime.Substring(11));
 
-            if (HH > 24 || mm > 59)
-                return BadRequest("Hora incorrecta.");
+                if (HH > 24 || mm > 59)
+                    return BadRequest("Hora incorrecta.");
 
-            var date = new DateTime(y, m, d, HH, mm, 0);
+                var date = new DateTime(y, m, d, HH, mm, 0);
 
-            var ocupationHour = this._repo.GetCurrentOccupationHour(date);
-            var currentAuthorizedCapacity = this._repo.GetCurrentAuthorizedCapacity(date);
+                var ocupationHour = this._repo.GetCurrentOccupationHour(date);
+                var currentAuthorizedCapacity = this._repo.GetCurrentAuthorizedCapacity(date);
 
-            result.Capacity = currentAuthorizedCapacity.Result;
-            result.Booked = ocupationHour;
-            result.Availability = result.Capacity - result.Booked;
-            result.BookedPercentage = (result.Booked * 100) / result.Capacity;
+                result.Capacity = currentAuthorizedCapacity.Result;
+                result.Booked = ocupationHour;
+                result.Availability = result.Capacity - result.Booked;
+                result.BookedPercentage = (result.Booked * 100) / result.Capacity;
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, datetime, ex);
+                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+            }
         }
         [HttpGet("schedule/{datetime}/booked/members")]
         public async Task<ActionResult> MembersInHour(string datetime)
@@ -220,6 +236,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, datetime, ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
         }
@@ -251,8 +268,94 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, day, ex);
                 return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
             }
+        }
+
+        [HttpPost("payment/{userId}")]
+        public async Task<IActionResult> Payment([FromBody] ReserveTimeDTO reserveData, int userId)
+        {
+            try
+            {
+
+                // HttpContent content = new HttpContent();
+                //var result = await client.PostAsync("Uri", content);
+                //var result = await client.GetAsync("Uri");
+
+                // Ejemplo de un Get.
+                using (HttpClient client = new HttpClient())
+                {
+                    using (HttpResponseMessage response = await client.GetAsync("Uri"))
+                    {
+                        using (HttpContent content = response.Content)
+                        {
+                            // content.Headers
+                            string myContent = await content.ReadAsStringAsync();
+                            // Console.WriteLine(myContent);
+
+                            HttpContentHeaders headers = content.Headers;
+                            headers.Add("Name", "Value");
+
+                        }
+                    }
+
+                }
+
+                // Ejemplo de un Post.
+                using (HttpClient client = new HttpClient())
+                {
+                    IEnumerable<KeyValuePair<string, string>> queries = new List<KeyValuePair<string, string>>()
+                {
+                    new KeyValuePair<string, string>("Query1","Valor1"),
+                    new KeyValuePair<string, string>("Query2","Valor2")
+                };
+
+                    HttpContent q = new FormUrlEncodedContent(queries);
+
+                    using (HttpResponseMessage response = await client.PostAsync("Uri", q))
+                    {
+                        using (HttpContent content = response.Content)
+                        {
+                            // content.Headers
+                            string myContent = await content.ReadAsStringAsync();
+                            // Console.WriteLine(myContent);
+
+                            HttpContentHeaders headers = content.Headers;
+                            headers.Add("Name", "Value");
+
+                        }
+                    }
+
+                }
+
+                // HttpContent content = new HttpContent();
+                //var result = await client.PostAsync("Uri", content);
+                //var result = await client.GetAsync("Uri");
+
+
+                /*
+                 var json = JsonConvert.SerializeObject(person);
+                var data = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var url = "https://httpbin.org/post";
+                using var client = new HttpClient();
+
+                var response = await client.PostAsync(url, data);
+
+                string result = response.Content.ReadAsStringAsync().Result;
+                Console.WriteLine(result);
+
+                 */
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName,  reserveData, ex);
+                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+            }
+
         }
     }
 }
