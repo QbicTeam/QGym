@@ -16,6 +16,9 @@ using prometheus.dto.securitas;
 using prometheus.data.gym;
 using prometheus.model.gym;
 using AutoMapper;
+using System.Reflection;
+using QGym.API.Helpers;
+using Microsoft.Extensions.Options;
 
 namespace QGym.API.Controllers
 {
@@ -27,11 +30,14 @@ namespace QGym.API.Controllers
         private readonly IGymRepository _repo;
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
-        public ScheduleController(IGymRepository repo, IConfiguration config, IMapper mapper)
+        private readonly IOptions<AppSettings> _appSettings;
+
+        public ScheduleController(IGymRepository repo, IConfiguration config, IMapper mapper, IOptions<AppSettings> appSettings)
         {
             this._repo = repo;
             this._config = config;
             this._mapper = mapper;
+            this._appSettings = appSettings;
         }
 
         [HttpGet()]
@@ -47,7 +53,8 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "N/A", ex);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
 
         }
@@ -70,7 +77,8 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, hours, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
         }
 

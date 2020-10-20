@@ -10,6 +10,7 @@ namespace prometheus.dto.gym.Members
         public string FullName { get; set; } // fullName  - Anterior: DisplayName
         public string Email { get; set; }
         public string PhotoUrl { get; set; }
+        public string SearchText { get; set; }
 
     }
 }

@@ -15,6 +15,13 @@ using prometheus.model.securitas;
 using prometheus.dto.securitas;
 using prometheus.data.gym;
 using prometheus.model.gym;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+
+using QGym.API.Helpers;
+using System.Reflection;
+using System.Diagnostics;
+using Newtonsoft.Json;
+using Microsoft.Extensions.Options;
 // using SIQbic.API.Model.Enums;
 
 namespace QGym.API.Controllers 
@@ -26,11 +33,38 @@ namespace QGym.API.Controllers
         private readonly IAuthRepository _repo;
         private readonly IGymRepository _repoGym;
         private readonly IConfiguration _config;
-        public AuthController(IAuthRepository repo, IGymRepository repoGym, IConfiguration config)
+        private readonly IOptions<AppSettings> _appSettings;
+
+        public AuthController(IAuthRepository repo, IGymRepository repoGym, IConfiguration config, IOptions<AppSettings> appSettings)
         {
             this._repo = repo;
             this._repoGym = repoGym;
             this._config = config;
+            this._appSettings = appSettings;
+        }
+        [HttpPost("register/confirmationCode")]
+        public async Task<ActionResult> RegisterConfirmationCode(UserForConfirmationCodeDTO confirmation)
+        {
+            try
+            {
+
+                var memberDb = await this._repoGym.GetMember(confirmation.Email, null, 0);
+                if (memberDb != null)
+                    return BadRequest("Usuario ya registrado, intente hacer login");
+
+
+                var codeConfirm = this._repo.GenerateConfirmationCode();
+
+                // TODO: Envio de Correo.
+
+
+                return Ok(codeConfirm);
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, confirmation, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
+            }
         }
 
         [HttpPost("register")]
@@ -69,7 +103,8 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, userForRegisterDto, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
         }
 
@@ -90,7 +125,8 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, userForUpdateRegisterDto, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
         }
 
@@ -110,19 +146,37 @@ namespace QGym.API.Controllers
                 if (!userFromRepo.IsActive)
                     return BadRequest("Usuario Bloqueado, contacte al Administrador.");
 
-                var memberDb = await _repoGym.GetMember(userFromRepo.UserName, "", 0);
+                var memberDb = await _repoGym.GetMember(userFromRepo.UserName, null, 0);
                 // if (string.IsNullOrEmpty(userFromRepo.PhotoUrl))
                 // {
                 //     //TODO: This must be removed...
                 //     userFromRepo.PhotoUrl = "http://majahide-001-site1.itempurl.com/releasecandidates/PhotosManagerAPI/prometheusmedia/SIQBICPROFILES/UserProfiles/nopic.jpg";
                 // }
-                
-                
+
+                /*
+                var userData = new {
+                    role = userFromRepo.Role.DisplayName,
+                    membershipExpiration = memberDb.MembershipExpiration,
+                    photoUrl = memberDb.PhotoUrl,
+                    packageId = memberDb.MembershipTypeActiveId
+                };
+                */
+                // uri foto
+                // role role
+                // version paquete
+                // expiration
+
                 var claims = new[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, memberDb.MemberId),
+                    new Claim(ClaimTypes.NameIdentifier, memberDb.User.Id.ToString()),
                     new Claim(ClaimTypes.Email, userFromRepo.UserName),
-                    new Claim(ClaimTypes.Name, userFromRepo.DisplayName)
+                    new Claim(ClaimTypes.Name, userFromRepo.DisplayName) //,
+                    //new Claim(ClaimTypes.Uri, memberDb.PhotoUrl == null ? "" : memberDb.PhotoUrl),
+                    //new Claim(ClaimTypes.Role, userFromRepo.Role.DisplayName),
+                    //new Claim(ClaimTypes.Version, memberDb.MembershipTypeActiveId == null ? "0" : memberDb.MembershipTypeActiveId.ToString()),
+                    //new Claim(ClaimTypes.Expiration, memberDb.MembershipExpiration.ToString("yyyy-MM-dd"))
+
+                    //new Claim(ClaimTypes.UserData,  JsonConvert.SerializeObject(userData))
                     // , new Claim(ClaimTypes.Webpage, userFromRepo.PhotoUrl)
                 };
 
@@ -147,11 +201,14 @@ namespace QGym.API.Controllers
                     token = tokenHandler.WriteToken(token),
                     role = userFromRepo.Role.DisplayName,
                     membershipExpiration = memberDb.MembershipExpiration,
-                    photoUrl = memberDb.PhotoUrl
+                    photoUrl = memberDb.PhotoUrl,
+                    packageId = memberDb.MembershipTypeActiveId == null ? 0 : memberDb.MembershipTypeActiveId
                 });
+                // return Ok(token);
             } catch(Exception ex)
             {
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, userForLoginDTO, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
         }
 
@@ -176,21 +233,93 @@ namespace QGym.API.Controllers
         [HttpPut("users/{id}")]
         public async Task<ActionResult> UpdateUser(int id, UserForUpdateDTO userForUpdate)
         {
-            var user = await this._repo.GetUserById(id);
+            try
+            {
 
-            user.DisplayName = userForUpdate.DisplayName;
-            // if (!string.IsNullOrEmpty(userForUpdate.PhotoUrl ))
-            //     user.PhotoUrl = userForUpdate.PhotoUrl;
 
-            //TODO: Missing Update responses.
+                var user = await this._repo.GetUserById(id);
 
-            //TODO: Missing change password
+                user.DisplayName = userForUpdate.DisplayName;
+                // if (!string.IsNullOrEmpty(userForUpdate.PhotoUrl ))
+                //     user.PhotoUrl = userForUpdate.PhotoUrl;
 
-            await this._repo.SaveAll();
+                //TODO: Missing Update responses.
 
-            return Ok(new { msg = ""});
+                //TODO: Missing change password
+
+                await this._repo.SaveAll();
+
+                return Ok(new { msg = "" });
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, userForUpdate, ex, "id: " + id.ToString());
+                return BadRequest(this._appSettings.Value.ServerError);
+            }
+
         }
 
+        [HttpPost("resetpassword/validation")]
+        public async Task<ActionResult> ResetPasswordValidation(UserForConfirmationCodeDTO toValidation)
+        {
+            try
+            {
+
+                var memberDb = await this._repoGym.GetMember(toValidation.MemberId, toValidation.MemberId, 0);
+                if (memberDb == null)
+                    return BadRequest("Usuario no encontrado");
+
+                var lst = await this._repoGym.GetValidationTypes();
+
+                return Ok(new { email = memberDb.User.UserName, keys = lst.Select(v => v.Name).ToList() });
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, toValidation, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
+            }
+        }
+        [HttpPost("resetpassword/confirmation")]
+        public async Task<ActionResult> ResetPasswordConfirmation(UserForConfirmationCodeDTO confirmation)
+        {
+            try
+            {
+                var valid = false;
+                var memberDb = await this._repoGym.GetMember(confirmation.Email, confirmation.MemberId, 0);
+                if (memberDb == null)
+                    return BadRequest("Usuario no encontrado");
+
+                // TODO: Esto esta provicional, Falta determinar los campos de validacion.
+                switch (confirmation.Key)
+                {
+                    case "Edad":
+                        if (confirmation.MemberId == confirmation.Value) valid = true;
+                        break;
+                    case "Fin Vigencia":
+                        if (confirmation.MemberId == confirmation.Value) valid = true;
+                        break;
+                    case "Telefono":
+                        if (confirmation.MemberId == confirmation.Value) valid = true;
+                        break;
+                }
+
+                if (!valid)
+                    return BadRequest("Verificacion Invalida");
+                
+
+                var codeConfirm = this._repo.GenerateConfirmationCode();
+
+                // TODO: Envio de Correo.
+
+
+                return Ok(codeConfirm);
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, confirmation, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
+            }
+        }
         [HttpPut("resetpassword")]
         public async Task<ActionResult> ResetPassword(UserForResertPwdDTO userForResetPwd)
         {
@@ -206,28 +335,52 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, userForResetPwd, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
         }
+
 
         [HttpPost("confirmationCode")]
         public async Task<IActionResult> ConfirmationCode(UserForConfirmationCodeDTO confirmationDto)
         {
+            // Este metodo valida el usuario por el MemberId, y verifica que el Correo Enviado, no este registrado previamente.
             try
             {
-                var memberDb = await this._repoGym.GetMember(confirmationDto.Email, confirmationDto.MemberId, 0);
+                var memberDb = await this._repoGym.GetMember(null, confirmationDto.MemberId, 0);
 
                 if (memberDb == null)
                     return BadRequest("Usuario no encontrado");
 
+                var memberEmailDb = await this._repoGym.GetMember(confirmationDto.Email, null, 0);
+                if (memberEmailDb != null)
+                    return BadRequest("El correo ya se encuentra Registrado");
+
+                //// TODO: Esto esta provicional, Falta determinar los campos de validacion.
+                //if (confirmationDto.Key == "Edad")
+                //{
+                //    if (confirmationDto.MemberId != confirmationDto.Value)
+                //    {
+                //        return BadRequest("Verificacion Invalida");
+                //    }
+                //}
+                var valid = false;
                 // TODO: Esto esta provicional, Falta determinar los campos de validacion.
-                if (confirmationDto.Key == "Edad")
+                switch (confirmationDto.Key)
                 {
-                    if (confirmationDto.MemberId != confirmationDto.Value)
-                    {
-                        return BadRequest("Verificacion Invalida");
-                    }
+                    case "Edad":
+                        if (confirmationDto.MemberId == confirmationDto.Value) valid = true;
+                        break;
+                    case "Fin Vigencia":
+                        if (confirmationDto.MemberId == confirmationDto.Value) valid = true;
+                        break;
+                    case "Telefono":
+                        if (confirmationDto.MemberId == confirmationDto.Value) valid = true;
+                        break;
                 }
+
+                if (!valid)
+                    return BadRequest("Verificacion Invalida");
 
                 var codeConfirm = this._repo.GenerateConfirmationCode();
 
@@ -238,7 +391,8 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, confirmationDto, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
         }
 
@@ -250,44 +404,52 @@ namespace QGym.API.Controllers
         // public List<QuestionResponseDTO> Responses { get; set; }  
 
         [HttpGet("users/{id}/settings")]
-        public async Task<ActionResult> GetUserSettings(int id) {
+        public async Task<ActionResult> GetUserSettings(int id) 
+        {
+            try
+            {
+                var user = await this._repo.GetUserById(id);
 
-            var user = await this._repo.GetUserById(id);
+                UserForSettingsDTO result = new UserForSettingsDTO();
 
-            UserForSettingsDTO result = new UserForSettingsDTO();
+                result.Id = user.Id;
+                result.DisplayName = user.DisplayName;
+                result.UserName = user.UserName;
+                // if (!string.IsNullOrEmpty(user.PhotoUrl))
+                // {
+                //     result.PhotoUrl = user.PhotoUrl;
+                // }
+                // else
+                // {
+                //     result.PhotoUrl = "http://majahide-001-site1.itempurl.com/releasecandidates/PhotosManagerAPI/prometheusmedia/SIQBICPROFILES/UserProfiles/nopic.jpg";
+                // }
+                // result.Questions = new List<QuestionForList>();
 
-            result.Id = user.Id;
-            result.DisplayName = user.DisplayName;
-            result.UserName = user.UserName;
-            // if (!string.IsNullOrEmpty(user.PhotoUrl))
-            // {
-            //     result.PhotoUrl = user.PhotoUrl;
-            // }
-            // else
-            // {
-            //     result.PhotoUrl = "http://majahide-001-site1.itempurl.com/releasecandidates/PhotosManagerAPI/prometheusmedia/SIQBICPROFILES/UserProfiles/nopic.jpg";
-            // }
-            // result.Questions = new List<QuestionForList>();
+                // var questions = await this._repo.GetQuestions();
 
-            // var questions = await this._repo.GetQuestions();
+                // foreach(var q in questions) {
+                //     result.Questions.Add(new QuestionForList{
+                //         Id = q.Id,
+                //         DisplayValue = q.DisplayText
+                //     });
+                // }
 
-            // foreach(var q in questions) {
-            //     result.Questions.Add(new QuestionForList{
-            //         Id = q.Id,
-            //         DisplayValue = q.DisplayText
-            //     });
-            // }
+                // result.Responses = new List<QuestionResponseDTO>();
 
-            // result.Responses = new List<QuestionResponseDTO>();
+                // foreach(var qr in user.QuestionResponses) {
+                //     result.Responses.Add(new QuestionResponseDTO {
+                //         QuestionId = qr.Id,
+                //         Response = qr.Response
+                //     });
+                // }
 
-            // foreach(var qr in user.QuestionResponses) {
-            //     result.Responses.Add(new QuestionResponseDTO {
-            //         QuestionId = qr.Id,
-            //         Response = qr.Response
-            //     });
-            // }
-
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, id, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
+            }
         }
 
         [HttpGet("member/{memberId}")]
@@ -295,21 +457,28 @@ namespace QGym.API.Controllers
         {
             try
             {
-                var memberDb = await this._repoGym.GetMember("", memberId, 0);
+                var memberDb = await this._repoGym.GetMember(null, memberId, 0);
+
+                if (memberDb == null)
+                    return NotFound("Socio no entrado."); // BadRequest("Usuario no encontrado");
+
+                if (memberDb.User.PasswordHash != null)
+                    return BadRequest("Socio ya registrado, intente hacer Login.");
 
                 var result = new MemberToValidateDTO();
 
                 result.DisplayName = memberDb.User.DisplayName;
 
-                result.Email = this._repo.ObfuscateEmail(memberDb.User.UserName);
-                if (string.IsNullOrEmpty(result.Email))
+                result.EmailObfuscated = this._repo.ObfuscateEmail(memberDb.User.UserName);
+                if (string.IsNullOrEmpty(result.EmailObfuscated))
                 {
                     var lst = await this._repoGym.GetValidationTypes();
                     result.ValidationTypes = lst.Select(v => v.Name).ToList();
                 }
                 else
                 {
-                    result.ConfirmationCode = this._repo.GenerateConfirmationCode();
+                    result.Email = memberDb.User.UserName;
+                    result.ConfirmationCode = Convert.ToInt32(this._repo.GenerateConfirmationCode());
                     // TODO: Mandar correo de confirmacion
                 }
                 
@@ -318,7 +487,8 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, memberId, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
 
         }

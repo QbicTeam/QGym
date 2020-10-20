@@ -1,5 +1,4 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 
 using System.Collections.Generic;
 using System.Linq;
+
+using System.Net.Http;
 
 using prometheus.data.securitas;
 using prometheus.model.securitas;
@@ -20,6 +21,14 @@ using prometheus.dto.gym.Capacity;
 using Newtonsoft.Json;
 using prometheus.dto.gym.Admin;
 using prometheus.dto.gym.Members;
+using System.Net.Http.Headers;
+using System;
+using QGym.API.Helpers;
+using System.Reflection;
+using Payment.DTOs;
+using Microsoft.Extensions.Options;
+using Payment.Utilities;
+//using Microsoft.AspNetCore.Authentication;
 
 namespace QGym.API.Controllers
 {
@@ -31,12 +40,18 @@ namespace QGym.API.Controllers
         private readonly IGymRepository _repo;
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
+        private readonly IOptions<AppSettings> _appSettings;
+        private readonly IHttpClientHelper _httpClientHelper;
+        private readonly IOptions<PaymentSettings> _paymentSettings;
 
-        public AdminController(IGymRepository repo, IConfiguration config, IMapper mapper)
+        public AdminController(IGymRepository repo, IConfiguration config, IMapper mapper, IOptions<AppSettings> appSettings, IOptions<PaymentSettings> paymentSettings, IHttpClientHelper httpClientHelper)
         {
             this._repo = repo;
             this._config = config;
             this._mapper = mapper;
+            this._appSettings = appSettings;
+            this._httpClientHelper = httpClientHelper;
+            this._paymentSettings = paymentSettings;
         }
 
         [HttpGet("settings/{field}")]
@@ -65,7 +80,8 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, field, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
 
         }
@@ -96,7 +112,8 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "N/A", ex);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
 
         }
@@ -149,42 +166,51 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, day, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
         }
         [HttpGet("schedule/{datetime}/capacity")]
         public async Task<ActionResult> CapacityInHour(string datetime)
         {
-            var result = new CapacityInHourDTO();
+            try
+            {
+                var result = new CapacityInHourDTO();
 
-            // datetime debe de estar enformato YYYYMMDD-HHmm
-            if (datetime.Length != 13)
-                return BadRequest("Formato de Fecha Incorrecto. (YYYYMMDD-HHmm)");
+                // datetime debe de estar enformato YYYYMMDD-HHmm
+                if (datetime.Length != 13)
+                    return BadRequest("Formato de Fecha Incorrecto. (YYYYMMDD-HHmm)");
 
-            var y = Convert.ToInt32(datetime.Substring(0, 4));
-            var m = Convert.ToInt32(datetime.Substring(4, 2));
-            var d = Convert.ToInt32(datetime.Substring(6,2));
+                var y = Convert.ToInt32(datetime.Substring(0, 4));
+                var m = Convert.ToInt32(datetime.Substring(4, 2));
+                var d = Convert.ToInt32(datetime.Substring(6, 2));
 
-            if (y < 2020 || m > 12 || d > 31)
-                return BadRequest("Fecha incorrecta.");
+                if (y < 2020 || m > 12 || d > 31)
+                    return BadRequest("Fecha incorrecta.");
 
-            var HH = Convert.ToInt32(datetime.Substring(9, 2));
-            var mm = Convert.ToInt32(datetime.Substring(11));
+                var HH = Convert.ToInt32(datetime.Substring(9, 2));
+                var mm = Convert.ToInt32(datetime.Substring(11));
 
-            if (HH > 24 || mm > 59)
-                return BadRequest("Hora incorrecta.");
+                if (HH > 24 || mm > 59)
+                    return BadRequest("Hora incorrecta.");
 
-            var date = new DateTime(y, m, d, HH, mm, 0);
+                var date = new DateTime(y, m, d, HH, mm, 0);
 
-            var ocupationHour = this._repo.GetCurrentOccupationHour(date);
-            var currentAuthorizedCapacity = this._repo.GetCurrentAuthorizedCapacity(date);
+                var ocupationHour = this._repo.GetCurrentOccupationHour(date);
+                var currentAuthorizedCapacity = this._repo.GetCurrentAuthorizedCapacity(date);
 
-            result.Capacity = currentAuthorizedCapacity.Result;
-            result.Booked = ocupationHour;
-            result.Availability = result.Capacity - result.Booked;
-            result.BookedPercentage = (result.Booked * 100) / result.Capacity;
+                result.Capacity = currentAuthorizedCapacity.Result;
+                result.Booked = ocupationHour;
+                result.Availability = result.Capacity - result.Booked;
+                result.BookedPercentage = (result.Booked * 100) / result.Capacity;
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, datetime, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
+            }
         }
         [HttpGet("schedule/{datetime}/booked/members")]
         public async Task<ActionResult> MembersInHour(string datetime)
@@ -220,7 +246,8 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, datetime, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
         }
         [HttpGet("members/{day}/elegibles")]
@@ -251,8 +278,40 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, day, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
+        }
+
+        [HttpPost("payment/{userId}")]
+        public async Task<IActionResult> Payment([FromBody] ReserveTimeDTO reserveData, int userId)
+        {
+            try
+            {
+                //var token = _httpClientHelper.GetAsync<string>()
+
+                var si = new SignInDto() { Email = this._paymentSettings.Value.UserPayment, Password = this._paymentSettings.Value.PasswordPayment };
+                var response = await _httpClientHelper.PostAsync<Result<AuthenticationResult>, SignInDto>(si, this._paymentSettings.Value.AutenticateUri);
+                if (!response.IsSuccess)
+                {
+                    return BadRequest("El Pago no se pudo realizar, contacte al Administrador"); // Error por login con Payment Adalid
+                }
+
+                var token = response.Value.Token;
+
+
+
+                //response
+                return Ok();
+
+
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, reserveData, ex);
+                return BadRequest(this._appSettings.Value.ServerError); //this._config.GetSection("AppSettings:ServerError").Value);
+            }
+
         }
     }
 }

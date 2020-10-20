@@ -10,8 +10,8 @@ using prometheus.data.gym;
 namespace prometheus.data.gym.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20201003234517_ScheduledUsers")]
-    partial class ScheduledUsers
+    [Migration("20201011225105_InicialDB")]
+    partial class InicialDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -56,6 +56,9 @@ namespace prometheus.data.gym.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("LoginAttempts")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NotificationCapacity")
                         .HasColumnType("int");
 
                     b.Property<int>("ScheduleChangeHours")
@@ -142,6 +145,29 @@ namespace prometheus.data.gym.Migrations
                     b.ToTable("MembershipTypes");
                 });
 
+            modelBuilder.Entity("prometheus.model.gym.UserScheduling", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("IsAttended")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Schedule")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserSchedulings");
+                });
+
             modelBuilder.Entity("prometheus.model.gym.ValidationType", b =>
                 {
                     b.Property<int>("Id")
@@ -219,6 +245,15 @@ namespace prometheus.data.gym.Migrations
                     b.HasOne("prometheus.model.securitas.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("prometheus.model.gym.UserScheduling", b =>
+                {
+                    b.HasOne("prometheus.model.securitas.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("prometheus.model.securitas.User", b =>
