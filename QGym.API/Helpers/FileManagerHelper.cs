@@ -8,7 +8,7 @@ namespace QGym.API.Helpers
 {
     public class FileManagerHelper
     {
-        public void RecordLogFile(string methodName, object objectSend, Exception ex)
+        public void RecordLogFile(string methodName, object objectSend, Exception ex, string valuesUri = null)
         {
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -17,7 +17,8 @@ namespace QGym.API.Helpers
                 + DateTime.Now.ToString("yyyyMMdd HH:mm") + Environment.NewLine
                 + "Method: " + methodName + Environment.NewLine
                 + "   Sended Information: (Serializado)"
-                + Environment.NewLine + JsonConvert.SerializeObject(objectSend) + Environment.NewLine
+                + Environment.NewLine + (valuesUri != null ? "Values in Uri: " + valuesUri + ";  " : "") 
+                + JsonConvert.SerializeObject(objectSend) + Environment.NewLine
                 + "Error:" + Environment.NewLine
                 + ex.Source + Environment.NewLine
                 + ex.Message + Environment.NewLine

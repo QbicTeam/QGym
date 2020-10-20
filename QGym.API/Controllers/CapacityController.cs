@@ -19,6 +19,7 @@ using AutoMapper;
 using prometheus.dto.gym.Capacity;
 using System.Reflection;
 using QGym.API.Helpers;
+using Microsoft.Extensions.Options;
 
 namespace QGym.API.Controllers
 {
@@ -30,11 +31,14 @@ namespace QGym.API.Controllers
         private readonly IGymRepository _repo;
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
-        public CapacityController(IGymRepository repo, IConfiguration config, IMapper mapper)
+        private readonly IOptions<AppSettings> _appSettings;
+
+        public CapacityController(IGymRepository repo, IConfiguration config, IMapper mapper, IOptions<AppSettings> appSettings)
         {
             this._repo = repo;
             this._config = config;
             this._mapper = mapper;
+            this._appSettings = appSettings;
         }
 
         [HttpGet()]
@@ -56,7 +60,7 @@ namespace QGym.API.Controllers
             catch (Exception ex)
             {
                 new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "N/A", ex);
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
 
         }
@@ -76,7 +80,7 @@ namespace QGym.API.Controllers
             catch (Exception ex)
             {
                 new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "N/A", ex);
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
 
         }
@@ -99,7 +103,7 @@ namespace QGym.API.Controllers
             catch (Exception ex)
             {
                 new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, totalCapacity, ex);
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
         }
 
@@ -131,7 +135,7 @@ namespace QGym.API.Controllers
             catch (Exception ex)
             {
                 new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, autCapacity, ex);
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
         }
 

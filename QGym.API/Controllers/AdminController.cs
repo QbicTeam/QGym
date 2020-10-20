@@ -25,6 +25,10 @@ using System.Net.Http.Headers;
 using System;
 using QGym.API.Helpers;
 using System.Reflection;
+using Payment.DTOs;
+using Microsoft.Extensions.Options;
+using Payment.Utilities;
+//using Microsoft.AspNetCore.Authentication;
 
 namespace QGym.API.Controllers
 {
@@ -36,12 +40,18 @@ namespace QGym.API.Controllers
         private readonly IGymRepository _repo;
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
+        private readonly IOptions<AppSettings> _appSettings;
+        private readonly IHttpClientHelper _httpClientHelper;
+        private readonly IOptions<PaymentSettings> _paymentSettings;
 
-        public AdminController(IGymRepository repo, IConfiguration config, IMapper mapper)
+        public AdminController(IGymRepository repo, IConfiguration config, IMapper mapper, IOptions<AppSettings> appSettings, IOptions<PaymentSettings> paymentSettings, IHttpClientHelper httpClientHelper)
         {
             this._repo = repo;
             this._config = config;
             this._mapper = mapper;
+            this._appSettings = appSettings;
+            this._httpClientHelper = httpClientHelper;
+            this._paymentSettings = paymentSettings;
         }
 
         [HttpGet("settings/{field}")]
@@ -71,7 +81,7 @@ namespace QGym.API.Controllers
             catch (Exception ex)
             {
                 new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, field, ex);
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
 
         }
@@ -103,7 +113,7 @@ namespace QGym.API.Controllers
             catch (Exception ex)
             {
                 new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "N/A", ex);
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
 
         }
@@ -157,7 +167,7 @@ namespace QGym.API.Controllers
             catch (Exception ex)
             {
                 new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, day, ex);
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
         }
         [HttpGet("schedule/{datetime}/capacity")]
@@ -199,7 +209,7 @@ namespace QGym.API.Controllers
             catch (Exception ex)
             {
                 new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, datetime, ex);
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
         }
         [HttpGet("schedule/{datetime}/booked/members")]
@@ -237,7 +247,7 @@ namespace QGym.API.Controllers
             catch (Exception ex)
             {
                 new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, datetime, ex);
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
         }
         [HttpGet("members/{day}/elegibles")]
@@ -269,7 +279,7 @@ namespace QGym.API.Controllers
             catch (Exception ex)
             {
                 new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, day, ex);
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
         }
 
@@ -278,82 +288,28 @@ namespace QGym.API.Controllers
         {
             try
             {
+                //var token = _httpClientHelper.GetAsync<string>()
 
-                // HttpContent content = new HttpContent();
-                //var result = await client.PostAsync("Uri", content);
-                //var result = await client.GetAsync("Uri");
-
-                // Ejemplo de un Get.
-                using (HttpClient client = new HttpClient())
+                var si = new SignInDto() { Email = this._paymentSettings.Value.UserPayment, Password = this._paymentSettings.Value.PasswordPayment };
+                var response = await _httpClientHelper.PostAsync<Result<AuthenticationResult>, SignInDto>(si, this._paymentSettings.Value.AutenticateUri);
+                if (!response.IsSuccess)
                 {
-                    using (HttpResponseMessage response = await client.GetAsync("Uri"))
-                    {
-                        using (HttpContent content = response.Content)
-                        {
-                            // content.Headers
-                            string myContent = await content.ReadAsStringAsync();
-                            // Console.WriteLine(myContent);
-
-                            HttpContentHeaders headers = content.Headers;
-                            headers.Add("Name", "Value");
-
-                        }
-                    }
-
+                    return BadRequest("El Pago no se pudo realizar, contacte al Administrador"); // Error por login con Payment Adalid
                 }
 
-                // Ejemplo de un Post.
-                using (HttpClient client = new HttpClient())
-                {
-                    IEnumerable<KeyValuePair<string, string>> queries = new List<KeyValuePair<string, string>>()
-                {
-                    new KeyValuePair<string, string>("Query1","Valor1"),
-                    new KeyValuePair<string, string>("Query2","Valor2")
-                };
-
-                    HttpContent q = new FormUrlEncodedContent(queries);
-
-                    using (HttpResponseMessage response = await client.PostAsync("Uri", q))
-                    {
-                        using (HttpContent content = response.Content)
-                        {
-                            // content.Headers
-                            string myContent = await content.ReadAsStringAsync();
-                            // Console.WriteLine(myContent);
-
-                            HttpContentHeaders headers = content.Headers;
-                            headers.Add("Name", "Value");
-
-                        }
-                    }
-
-                }
-
-                // HttpContent content = new HttpContent();
-                //var result = await client.PostAsync("Uri", content);
-                //var result = await client.GetAsync("Uri");
+                var token = response.Value.Token;
 
 
-                /*
-                 var json = JsonConvert.SerializeObject(person);
-                var data = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var url = "https://httpbin.org/post";
-                using var client = new HttpClient();
-
-                var response = await client.PostAsync(url, data);
-
-                string result = response.Content.ReadAsStringAsync().Result;
-                Console.WriteLine(result);
-
-                 */
-
+                //response
                 return Ok();
+
+
             }
             catch (Exception ex)
             {
-                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName,  reserveData, ex);
-                return BadRequest(this._config.GetSection("AppSettings:ServerError").Value);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, reserveData, ex);
+                return BadRequest(this._appSettings.Value.ServerError); //this._config.GetSection("AppSettings:ServerError").Value);
             }
 
         }

@@ -53,6 +53,9 @@ namespace QGym.API.Helpers
                 })
                 .ForMember(dest => dest.FullName, opt => {
                     opt.MapFrom(src => src.User.DisplayName);
+                })
+                .ForMember(dest => dest.SearchText, opt => {
+                    opt.MapFrom(src => src.MemberId + " " + src.User.DisplayName + " " + src.User.UserName);
                 });
 
             CreateMap<Member, MemberForBlockDTO>()

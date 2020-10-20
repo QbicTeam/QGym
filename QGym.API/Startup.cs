@@ -21,6 +21,8 @@ using prometheus.data.securitas;
 using prometheus.data.gym;
 
 using AutoMapper;
+using prometheus.model.gym;
+using QGym.API.Helpers;
 
 namespace QGym.API
 {
@@ -45,15 +47,19 @@ namespace QGym.API
             services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionRemoteSQLServer")));
             services.AddDbContext<SecuritasDbContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionRemoteSQLServer")));
 
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+            services.Configure<PaymentSettings>(Configuration.GetSection("PaymentSetting"));
+            services.AddHttpClient();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-           services.AddCors();
-           services.AddAutoMapper();
+            services.AddCors();
+            services.AddAutoMapper();
 
-           services.AddScoped<IGymRepository, GymRepository>();
-           services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IGymRepository, GymRepository>();
+            services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddTransient<IHttpClientHelper, HttpClientHelper>();
 
-           services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
@@ -65,7 +71,7 @@ namespace QGym.API
                     };
                 });
                             
-           services.AddControllers();
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

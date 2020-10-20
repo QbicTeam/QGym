@@ -8,7 +8,8 @@ namespace prometheus.dto.securitas
     {
         public string DisplayName { get; set; }
         public string Email { get; set; }
-        public string ConfirmationCode { get; set; }
+        public string EmailObfuscated { get; set; }
+        public int ConfirmationCode { get; set; }
 
         public List<string> ValidationTypes { get; set; }
 
