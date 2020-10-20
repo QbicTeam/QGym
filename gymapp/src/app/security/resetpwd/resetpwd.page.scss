@@ -51,12 +51,13 @@
     font-size: 15px;
 }
 
-ion-label {
-    color:#000;
-    opacity: .8;
-    font-size: 13px;
-    display: block;
-}
+// ion-label {
+//     color:#000;
+//     opacity: .8;
+//     font-size: 13px;
+//     display: block;
+// }
+
 
 ion-content {
     --background: url('../../../assets/images/background.jpg');
@@ -89,9 +90,35 @@ ion-item {
     height: 30px;
 }
 
-ion-label {
-    color:#000;
-    opacity: .8;
-    font-size: 13px;
-    display: block;
+
+ion-select {
+    /* Applies to the value and placeholder color */
+    color: #000;
+  
+    /* Set a different placeholder color */
+    --placeholder-color: #971e49;
+  
+    /* Set full opacity on the placeholder */
+    --placeholder-opacity: 1;
+  }
+
+  ion-card p {
+    font-size: 10px;
+}
+
+.resendCode {
+    margin-top: 8px;
+    text-align: center;
+}
+
+.emailConfirmationCode {
+    color: var(--theme-white);
+}
+
+.welcome {
+    color: var(--theme-black);
+}
+
+.resendButton {
+    text-align: center;
 }

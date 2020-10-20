@@ -1,39 +1,82 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GymService {
 
-  constructor() { }
+  baseUrl = environment.apiurl;
+
+  constructor(private http: HttpClient) { }
 
   getMembersList() {
 
-    const data = [
-      {
-        memberId: 12345,
-        fullName: 'Camila Sodi',
-        email: 'camilasodi@gmail.com',
-        photoUrl: 'https://image.shutterstock.com/image-photo/beauty-asian-woman-face-portrait-260nw-607071935.jpg',
-        searchText: '12345 Camila Sodi camilasodi@gmail.com'
-      },
-      {
-        memberId: 67890,
-        fullName: 'Emma artenton',
-        email: 'emma@hotmail.com',
-        photoUrl: 'https://thumbs.dreamstime.com/b/beauty-woman-face-portrait-beautiful-spa-model-girl-perfect-fresh-clean-skin-youth-skin-care-concept-brunette-female-63494003.jpg',
-        searchText: '67890 Emma artenton emma@hotmail.com'
-      },
-      {
-        memberId: 24680,
-        fullName: 'Anne Hateway',
-        email: 'anne@gmail.com',
-        photoUrl: 'https://banner2.cleanpng.com/20180723/lho/kisspng-plastic-surgery-cosmetics-woman-face-skin-care-model-5b5605a8b02fd8.3457753715323642007217.jpg',
-        searchText: '24680 Anne Hateway anne@gmail.com'
-      },
-    ];
+    const url = this.baseUrl + 'members/valid';
 
-    return data;
+    return this.http.get(url);
+  }
+
+  getMemberDataForBlock(memberId: string) {
+    const url = this.baseUrl + 'members/' + memberId + '/details/forBlock';
+
+    return this.http.get(url);
+  }
+
+  updateMemberStatus(memberId: string, bloqued: boolean, reason: string) {
+
+    const url = this.baseUrl + 'members/' + memberId + '/status';
+
+    const requestData = {
+      isBlock: !bloqued,
+      blockingReason: reason
+    };
+
+    return this.http.put(url, requestData);
+  }
+
+  getCapacityData() {
+
+    const url = this.baseUrl + 'capacity';
+
+    return this.http.get(url);
+  }
+
+  updateTotalCapacity(totalCapacity: any) {
+
+    const url = this.baseUrl + 'capacity/' + totalCapacity;
+
+    return this.http.put(url, null);
+  }
+
+  addAuthorizedCapacity(startDate, endDate, percentage, people) {
+
+    const url = this.baseUrl + 'capacity/autorizedCapacities';
+
+    const requestData = {
+      startDate,
+      endDate,
+      capacity: people,
+      percentageCapacity: percentage
+    };
+
+    return this.http.post(url, requestData);
+
+  }
+
+  getScheduleConfiguration() {
+
+    const url = this.baseUrl + 'schedule';
+
+    return this.http.get(url);
+  }
+
+  updateScheduleConfiguration(previousHours: any) {
+
+    const url = this.baseUrl + 'schedule/' + previousHours;
+
+    return this.http.put(url, null);
 
   }
 

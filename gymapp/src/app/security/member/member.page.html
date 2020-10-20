@@ -78,13 +78,13 @@
           <ion-card>            
             <ion-card-content>
               <p>
-              Hemos enviado a tu correo <strong class="emailConfirmationCode">majah**********@hotmail.com</strong> un CODIGO DE CONFIRMACION, anotalo en el recuadro siguiente:
+              Hemos enviado a tu correo <strong class="emailConfirmationCode">{{memberEmail}}</strong> un CODIGO DE CONFIRMACION, anotalo en el recuadro siguiente:
               </p>
               <p class="resendCode">
                 EN CASO DE NO RECIBIR DICHO CODIGO, SOLICITAR EL REENVIO DE CONFIRMACION
               </p>
               <p class="resendButton">
-                <ion-button color="gym-secondary" class="ion-button-class" shape="round" fill="solid">Reenviar Confirmacion</ion-button>
+                <ion-button color="gym-secondary" (click)="onIdentityConfirmation()" class="ion-button-class" shape="round" fill="solid">Reenviar Confirmacion</ion-button>
               </p>
             </ion-card-content>
           </ion-card>

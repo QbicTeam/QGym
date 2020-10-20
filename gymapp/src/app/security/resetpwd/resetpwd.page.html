@@ -1,7 +1,10 @@
 <ion-header no-border>
-  <div class="login-header ion-padding">
-    <img src="../../assets/images/logo.png" alt="" class="logo-img">
-  </div>
+  <!-- <div class="login-header ion-padding"> -->
+    <ion-item class="login-header" transparent lines="none">
+      <ion-back-button color="gym-primary" slot="start"></ion-back-button>
+      <img src="../../assets/images/logo.png" alt="" class="logo-img">
+    </ion-item>
+  <!-- </div> -->
 </ion-header>
 
 <ion-content>
@@ -16,31 +19,129 @@
             <h1 big-heading>Reestablecer contraseña</h1>
           </div>
       
-          <ion-item transparent>
-            <ion-icon color="gym-primary" name="person-circle-outline"></ion-icon>
-            <!-- <ion-input formControlName="email" placeholder="Usuario" type="text"></ion-input> -->
+          <form [formGroup]="identityForm">
+
+            <ion-item transparent>
+              <ion-icon color="gym-primary" name="person-circle-outline"></ion-icon>
+              <ion-input formControlName="identity" type="text" placeholder="Usuario o Numero de membresia"></ion-input>
+            </ion-item>
+
+          <ion-item *ngIf="identityForm.get('identity').hasError('required') && identityForm.get('identity').touched" transparent lines="none">
+              <ion-label color="gym-primary">* Correo electronico o Membresia.</ion-label>
           </ion-item>
 
-          <!-- <ion-item *ngIf="loginForm.get('email').hasError('required') && loginForm.get('email').touched" transparent lines="none">
-              <ion-label color="gym-primary">* Es necesario introducir el correo electronico.</ion-label>
-          </ion-item> -->
-      
+            <ion-button *ngIf="!optionsSelection" [disabled]="identityForm.invalid" (click)="onRequestQuestions()" color="gym-primary" class="ion-button-class" shape="round" fill="solid" size="small" expand="block">Iniciar</ion-button>
+
+          </form>
+
+          <ion-item transparent  *ngIf="optionsSelection">
+            <ion-label color="gym-primary">Opciones: </ion-label>
+            <ion-select [(ngModel)]="selectedOption" placeholder="Seleccionar Opcion">
+              <ion-select-option *ngFor="let opt of optionsSelection" selected="true" [value]="opt">{{opt}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+
+          <form *ngIf="optionsSelection" [formGroup]="responseForm">
+          
+            <ion-item transparent>
+              <ion-icon color="gym-primary" name="list-circle-outline"></ion-icon>
+              <ion-input formControlName="response" placeholder="Capture su respuesta" type="text"></ion-input>
+            </ion-item>
+
+            <ion-item *ngIf="responseForm.get('response').hasError('required') && responseForm.get('response').touched" transparent lines="none">
+              <ion-label color="gym-primary">* La respuesta es requerida.</ion-label>
+            </ion-item>
+
+
+            <ion-button *ngIf="!confirmationCodeForm.value.confirmationCodeSent" [disabled]="responseForm.invalid" (click)="onRequestConfirmationCode()" color="gym-primary" class="ion-button-class" shape="round" fill="solid" size="small" expand="block">Solicitar Codigo</ion-button>
+
+          </form>
+
+          <form *ngIf="confirmationCodeForm.value.confirmationCodeSent" [formGroup]="confirmationCodeForm">
+
+          <ion-card>            
+            <ion-card-content>
+              <p>
+              Hemos enviado a tu correo un CODIGO DE CONFIRMACION, anotalo en el recuadro siguiente:
+              </p>
+              <p class="resendCode">
+                EN CASO DE NO RECIBIR DICHO CODIGO, SOLICITAR EL REENVIO DE CONFIRMACION
+              </p>
+              <p class="resendButton">
+                <ion-button color="gym-secondary" (click)="onRequestConfirmationCode()" class="ion-button-class" shape="round" fill="solid">Reenviar Confirmacion</ion-button>
+              </p>
+            </ion-card-content>
+          </ion-card>
+
+        </form>
+
+        <form *ngIf="confirmationCodeForm.value.confirmationCodeSent" [formGroup]="confirmationCodeForm">
+
+          <ion-item transparent>
+            <ion-icon color="gym-primary" name="swap-horizontal-outline"></ion-icon>
+            <ion-input formControlName="confirmationCode" placeholder="Codigo de Confirmacion" type="number"></ion-input>
+          </ion-item>
+
+          <div class="invalid-feedback" *ngIf="confirmationCodeForm.get('confirmationCode').hasError('required') 
+          && confirmationCodeForm.get('confirmationCode').touched">
+            <ion-label color="gym-primary">* El codigo de confirmacion es requerido.</ion-label>
+          </div>
+
+          <div class="invalid-feedback" *ngIf="confirmationCodeForm.hasError('mismatchCode') 
+            && confirmationCodeForm.get('confirmationCode').touched">
+
+            <ion-label color="gym-primary">* El codigo de confirmacion no es correcto.</ion-label>
+
+          </div>
+
+          <div linespace></div>
+              
+        </form>
+
+        <form *ngIf="!confirmationCodeForm.invalid" [formGroup]="passwordForm">
+
           <ion-item transparent>
             <ion-icon color="gym-primary" name="lock-closed-outline"></ion-icon>
-            <!-- <ion-input formControlName="password" placeholder="Clave" type="password"></ion-input> -->
+            <ion-input formControlName="password" type="password" placeholder="Clave de Acceso"></ion-input>
           </ion-item>
 
-          <!-- <ion-item *ngIf="loginForm.get('password').hasError('required') && loginForm.get('password').touched" transparent lines="none">
-            <ion-label color="gym-primary">* Es necesario introducir la clave de acceso.</ion-label>
-          </ion-item> -->
-        
-      
+          <div class="invalid-feedback" *ngIf="passwordForm.get('password').hasError('required') 
+          && passwordForm.get('password').touched">
+          <ion-label color="gym-primary">* La clave de acceso es requerida.</ion-label>
+          </div>
+
+          <div class="invalid-feedback" *ngIf="passwordForm.get('password').hasError('minlength') 
+            && passwordForm.get('password').touched">
+            <ion-label color="gym-primary">* La clave de acceso debe contener al menos 4 caracteres.</ion-label>
+          </div>
+
+          <div class="invalid-feedback" *ngIf="passwordForm.get('password').hasError('maxlength') 
+            && passwordForm.get('password').touched">
+            <ion-label color="gym-primary">* La clave de acceso no debe exeder los 8 caracteres</ion-label>
+          </div>
+
+          <ion-item transparent>
+            <ion-icon color="gym-primary" name="lock-closed-outline"></ion-icon>
+            <ion-input formControlName="confirmPassword" type="password" placeholder="Confirmacion Clave de Acceso"></ion-input>
+          </ion-item>
+
+          <div class="invalid-feedback" *ngIf="passwordForm.get('confirmPassword').hasError('required') 
+            && passwordForm.get('confirmPassword').touched">
+            <ion-label color="gym-primary">* La clave de acceso es requerida</ion-label>
+          </div>
+
+          <div class="invalid-feedback" *ngIf="passwordForm.hasError('mismatch') 
+            && passwordForm.get('confirmPassword').touched">
+            <ion-label color="gym-primary">* Las claves de acceso no coinciden</ion-label>
+          </div>
+  
           <div linespace></div>
       
-          <!-- <ion-button [disabled]="loginForm.invalid" (click)="onLogin()" color="gym-primary" class="ion-button-class" shape="round" fill="solid" size="large" expand="block">Iniciar Sesion</ion-button> -->
-          
-        <!-- </form> -->
-      
+          <ion-button [disabled]="passwordForm.invalid" (click)="onResetPassword()" color="gym-primary" class="ion-button-class" shape="round" fill="solid" expand="block">Cambiar Clave</ion-button>
+
+        </form>
+
 
       </ion-col>
     </ion-row>

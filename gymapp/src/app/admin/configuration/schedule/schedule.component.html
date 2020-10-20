@@ -10,13 +10,13 @@
     <ion-col>
       <ion-item transparent>
         <ion-label position="floating">Horas antes</ion-label>
-        <ion-input placeholder="Horas" type="text"></ion-input>
+        <ion-input [(ngModel)]="data" placeholder="Horas" type="text"></ion-input>
       </ion-item>  
     </ion-col>
   </ion-row>
   <ion-row>
     <ion-col>
-      <ion-button expand="block" fill="outline">Grabar</ion-button>
+      <ion-button (click)="onUpdateConfiguration()" expand="block" fill="outline">Grabar</ion-button>
     </ion-col>
   </ion-row>
 </ion-grid>

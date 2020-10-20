@@ -4,6 +4,7 @@ import { Observable, EMPTY } from 'rxjs';
 import { AlertController, LoadingController } from '@ionic/angular';
 
 import { catchError, finalize, retryWhen } from 'rxjs/operators';
+import { clearScreenDown } from 'readline';
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
@@ -11,6 +12,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     constructor(private loadingCtrl: LoadingController, private alertCtrl: AlertController) {}
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+
 
         this.loadingCtrl.getTop().then(hasLoading => {
             if (!hasLoading) {
@@ -35,23 +37,6 @@ export class HttpRequestInterceptor implements HttpInterceptor {
             })
         );
 
-        // return next.handle(request).pipe(
-        //     finalize(() => {
-        //         this.loadingCtrl.getTop().then(hasLoading => {
-        //             if (hasLoading) {
-        //                 this.loadingCtrl.dismiss();
-        //             }
-        //         });
-        //     })
-        // );
-
-        // return next.handle(request).pipe(
-        //     retryWhen(err => {
-
-        //     })
-        // );
-
-        return EMPTY;
     }
 
     async presentFailedAlert(msg) {
@@ -63,4 +48,5 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
         (await alert).present();
     }
+
 }

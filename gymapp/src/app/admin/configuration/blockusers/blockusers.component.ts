@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { GymService } from 'src/app/api/gym.service';
 import { ModalController } from '@ionic/angular';
 import { BlockModalComponent } from '../block-modal/block-modal.component';
+import { SharedService } from 'src/app/api/shared.service';
 
 @Component({
   selector: 'app-blockusers',
@@ -10,17 +11,28 @@ import { BlockModalComponent } from '../block-modal/block-modal.component';
 })
 export class BlockusersComponent implements OnInit {
 
-  data: any[] = [];
-  dataSearched: any[];
+  @Input() data: any;
+  @Input() dataSearched: any;
 
-  constructor(private gymService: GymService, private modalCtrl: ModalController) { }
+  constructor(private gymService: GymService, private modalCtrl: ModalController, private sharedService: SharedService) { }
 
   ngOnInit() {
 
-    this.data = this.gymService.getMembersList();
-    this.dataSearched = this.data;
+    // this.loadActiveMemberList();
 
   }
+
+  // loadActiveMemberList() {
+
+  //   this.gymService.getMembersList().subscribe(response => {
+
+  //     console.log(response);
+
+  //     this.data = response;
+  //     this.dataSearched = this.data;
+
+  //   });
+  // }
 
   searchMember(event) {
 
