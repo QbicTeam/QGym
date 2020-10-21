@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { GymService } from 'src/app/api/gym.service';
+import { SecurityService } from 'src/app/api/security.service';
 import { SharedService } from 'src/app/api/shared.service';
 
 @Component({
@@ -9,6 +11,9 @@ import { SharedService } from 'src/app/api/shared.service';
 })
 export class ConfigurationPage implements OnInit {
 
+  currentMenu: any;
+  currentUser: any;
+
   currentView = 'block';
   data: any;
   dataSearched: any;
@@ -16,10 +21,19 @@ export class ConfigurationPage implements OnInit {
   capacityData: any;
   scheduleData: any;
 
-  constructor(private gymService: GymService, private sharedService: SharedService) { }
+  constructor(private gymService: GymService, private sharedService: SharedService,
+              private securityService: SecurityService, private router: Router) { }
 
   ngOnInit() {
+
     this.initSubscriptions();
+
+
+    this.currentUser = this.securityService.getCurrentLoggedUser();
+    this.currentMenu = this.securityService.getMenuByCurrentUserRole();
+
+    console.log(this.currentUser);
+
   }
 
   initSubscriptions() {
@@ -87,5 +101,29 @@ export class ConfigurationPage implements OnInit {
     console.log('loading memberships data...');
   }
 
+  onMyProfile() {
+
+  }
+
+  onSelectedOption(option) {
+
+    console.log(option);
+
+    if (option === 'packages') {
+      this.router.navigate(['/packages']);
+    }
+    else if (option === 'schedule') {
+      this.router.navigate(['/schedule']);
+    }
+    else if (option === 'frontdesk') {
+      this.router.navigate(['/frontdesk']);
+    }
+    else if (option === 'admin') {
+      this.router.navigate(['/configuration']);
+    }
+    else if (option === 'sales') {
+      this.router.navigate(['/sales-report']);
+    }
+  }
 
 }
