@@ -4,7 +4,6 @@ import { Observable, EMPTY } from 'rxjs';
 import { AlertController, LoadingController } from '@ionic/angular';
 
 import { catchError, finalize, retryWhen } from 'rxjs/operators';
-import { clearScreenDown } from 'readline';
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
