@@ -82,6 +82,25 @@ namespace QGym.API.Controllers
             }
 
         }
+        [HttpGet("{id}/fullDescription")]
+        public async Task<ActionResult> GetPackagesFullDescription(int id)
+        {
+            try
+            {
+
+                var package = await _repo.GetMembershipById(id);
+                var result = new MembershipTypeFullDTO() { LongDescription = package.LongDescription };
+                //var result = _mapper.Map<MembershipTypeFullDTO>(package);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, id, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
+            }
+
+        }
         [HttpGet("actives")]
         public async Task<ActionResult> GetActivesPackages()
         {
@@ -128,6 +147,9 @@ namespace QGym.API.Controllers
                     packageDb.LongDescription = packageRq.LongDescription;
 
                 packageDb.IsActive = packageRq.IsActive;
+
+                if(packageDb.IsActive && (string.IsNullOrEmpty(packageRq.LongDescription) || string.IsNullOrEmpty(packageRq.ShortDescription)))
+                    return BadRequest("Valor Invalido, Descripciones HTML (requeridas cuando se activa)");
 
                 await this._repo.SaveAll();
 

@@ -22,6 +22,7 @@ using Newtonsoft.Json;
 using System.Reflection;
 using QGym.API.Helpers;
 using Microsoft.Extensions.Options;
+using prometheus.dto.gym.Membership;
 
 namespace QGym.API.Controllers
 {
@@ -109,34 +110,41 @@ namespace QGym.API.Controllers
 
         }
 
-        [HttpGet("{memberId}/details/complete")]
-        public async Task<ActionResult> GetMembarsFull(string memberId)
+        [HttpGet("{userId}/details/complete")]
+        public async Task<ActionResult> GetMembarsFull(int userId)
         {
             try
             {
-                var dataDb = await this._repo.GetMember(null, memberId, 0);
+                var dataDb = await this._repo.GetMember(null, null, userId); // memberId
+                var package = new MembershipType();
+
+                if (dataDb.MembershipTypeActiveId != null && dataDb.MembershipTypeActiveId > 0)
+                    package = await this._repo.GetMembershipById(dataDb.MembershipTypeActiveId.Value);
 
                 var result = _mapper.Map<MemberDTO>(dataDb);
+                if (package.Id > 0)
+                    result.MembershipTypeActive = _mapper.Map<MembershipTypeDTO>(package);
 
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, memberId, ex);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, userId, ex); // memberId, ex);
                 return BadRequest(this._appSettings.Value.ServerError);
             }
 
         }
         
-        [HttpPut("{memberId}/status/{isBlock}")]
-        public async Task<IActionResult> UpdatingStatus(string memberId, int isBlock)
+        [HttpPut("{memberId}/status")]
+        public async Task<IActionResult> UpdatingStatus(string memberId, [FromBody] MemberForBlockDTO data)
         {
             try
             {
 
                 var user = await this._repo.GetMember(null, memberId, 0);
 
-                user.User.IsActive = isBlock == 1? false : true;
+                user.User.IsActive = !data.IsBlock;   //isBlock == 1? false : true;
+                user.BlockingReason = data.BlockingReason;
 
                 await this._repo.SaveAll();
                 
@@ -144,27 +152,36 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
-                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, memberId + ", IsBlock:" + isBlock.ToString(), ex);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, data, ex,"MemberId: " + memberId);
                 return BadRequest(this._appSettings.Value.ServerError);
             }
         }
 
-        [HttpPut("{memberId}")]
-        public async Task<IActionResult> Updating([FromBody] MemberDTO member, string memberId)
+        [HttpPut("{userId}")]
+        public async Task<IActionResult> Updating([FromBody] MemberDTO member, int userId) // string memberId)
         {
             try
             {
-                var memberDb = await this._repo.GetMember(null, memberId, 0);
+                var memberDb = await this._repo.GetMember(null, null, userId); // memberId, 0); 
 
+                if (memberDb == null)
+                    return NotFound("El Usuario no esta registrado");
 
-                if(!string.IsNullOrEmpty(member.MemberId) && string.IsNullOrEmpty(memberDb.MemberId))
-                    memberDb.MemberId = member.MemberId;
+                if (!string.IsNullOrEmpty(member.MemberId) && string.IsNullOrEmpty(memberDb.MemberId))
+                {
+                    var validateMemberId = await this._repo.GetMember(null, member.MemberId, 0);
+                    if (validateMemberId == null)
+                        memberDb.MemberId = member.MemberId;
+                    else
+                        return BadRequest("El Numero de Membresia ya esta registrado.");
+                }
+                    
 
-                if (!string.IsNullOrEmpty(member.PhotoUrl) && string.IsNullOrEmpty(memberDb.PhotoUrl))
+                if (!string.IsNullOrEmpty(member.PhotoUrl) ) // && string.IsNullOrEmpty(memberDb.PhotoUrl))
                     memberDb.PhotoUrl = member.PhotoUrl;
 
-                if (!string.IsNullOrEmpty(member.PhotoUrl) && memberDb.PhotoUrl != member.PhotoUrl)
-                    memberDb.PhotoUrl = member.PhotoUrl;
+                //if (!string.IsNullOrEmpty(member.PhotoUrl) && memberDb.PhotoUrl != member.PhotoUrl)
+                //    memberDb.PhotoUrl = member.PhotoUrl;
 
                 if (member.MembershipExpiration > memberDb.MembershipExpiration)
                     memberDb.MembershipExpiration = member.MembershipExpiration;
@@ -208,7 +225,7 @@ namespace QGym.API.Controllers
             }
             catch (Exception ex)
             {
-                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, member, ex);
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, member, ex, "userId: " + userId.ToString());
                 return BadRequest(this._appSettings.Value.ServerError);
             }
         }

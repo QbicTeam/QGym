@@ -11,16 +11,19 @@ using Framework.DataTypes.Model.Infraestructura;
 using prometheus.model.gym;
 using prometheus.model.securitas;
 using System;
+using Microsoft.Extensions.Options;
 
 namespace prometheus.data.gym
 {
     public class GymRepository: IGymRepository
     {
         private readonly DataContext _context;
+        private readonly IOptions<AppSettings> _appSettings;
 
-        public GymRepository(DataContext context)
+        public GymRepository(DataContext context, IOptions<AppSettings> appSettings)
         {
             _context = context;
+            _appSettings = appSettings;
         }
 
         public void Add<T>(T entity) where T: class
@@ -43,6 +46,7 @@ namespace prometheus.data.gym
             member.MemberId = memberId;
             member.IsVerified = string.IsNullOrEmpty(memberId) ? false : true;
             member.MembershipExpiration = DateTime.Now.AddDays(-1);
+            member.PhotoUrl = _appSettings.Value.PhotoDefault;
 
             await this._context.Members.AddAsync(member);
             await this._context.SaveChangesAsync();

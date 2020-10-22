@@ -13,6 +13,7 @@ namespace prometheus.dto.gym.Admin
         public string Period { get; set; }
         public DateTime DueDate { get; set; }
         public string PhotoUrl { get; set; }
+        public int UserId { get; set; }
 
     }
 }
