@@ -12,7 +12,7 @@
 <ion-content class="ion-padding">
 
 
-<ion-list>
+<ion-list *ngIf="memberInfo">
   <ion-item class="item ios in-list ion-focusable hydrated item-label">
     <ion-avatar slot="start" class="ios hydrated">
       <img src="{{photoUrl}}">
@@ -30,7 +30,7 @@
   </ion-item>
 
   <ion-item>
-    <ion-toggle [(ngModel)]="isBlocked" [disabled]="!isBlocked && !reason"></ion-toggle>
+    <ion-toggle (click)="onChangeStatus()" [(ngModel)]="isBlocked" [disabled]="!isBlocked && !reason"></ion-toggle>
   </ion-item>
 
 </ion-list>

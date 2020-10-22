@@ -1,12 +1,44 @@
 <ion-header>
   <ion-toolbar>
+    <ion-menu-button color="gym-primary" autoHide="false" menu="configurationmenu" slot="start"></ion-menu-button>
     <ion-title>Configuracion del Sistema</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-menu side="start" menuId="configurationmenu" contentId="configurationContent">
+  <ion-content>
+    <div class="menu-header-bg"></div>
+    <div class="header-content">
+      <img src="{{currentUser.photoUrl}}" alt="">
+      <ion-label>
+        <h2>{{currentUser.displayName}}</h2>
+        <h3>{{currentUser.email}}</h3>
+        <p>Socio: {{currentUser.id}}</p>
+        <p><ion-badge color="light">{{currentUser.expiration | date:'dd MMM, yyyy'}}</ion-badge></p>
+      </ion-label>
+    </div>
+    <div class="action-button">
+      <ion-button (click)="onMyProfile()">
+        <ion-icon name="create-outline"></ion-icon>
+        Editar</ion-button>
+    </div>
 
-  <ion-segment [(ngModel)]="currentView">
+    <ion-list class="menu-items" lines="none">
+      <ion-item *ngFor="let mnu of currentMenu" button transparent (click)="onSelectedOption(mnu.option)">
+        <ion-icon slot="start" color="gym-primary" name="{{mnu.icon}}"></ion-icon>
+        <ion-label color="gym-primary">{{mnu.displayName}}</ion-label>
+      </ion-item>
+    </ion-list>
+
+  </ion-content>
+</ion-menu>
+
+
+
+
+<ion-content id="configurationContent">
+
+  <ion-segment (click)="onOptionSelected()" [(ngModel)]="currentView">
     <ion-segment-button value="block">
       <ion-icon name="close-circle-outline"></ion-icon>
       <ion-label>Bloqueo</ion-label>
@@ -29,9 +61,9 @@
     </ion-segment-button>
   </ion-segment>
 
-  <app-blockusers *ngIf="currentView === 'block'"></app-blockusers>
-  <app-capacity *ngIf="currentView === 'ocupation'"></app-capacity>
-  <app-schedule *ngIf="currentView === 'schedule'"></app-schedule>
+  <app-blockusers [data]="data" [dataSearched]="dataSearched" *ngIf="currentView === 'block'"></app-blockusers>
+  <app-capacity [data]="capacityData" *ngIf="currentView === 'ocupation'"></app-capacity>
+  <app-schedule [data]="scheduleData" *ngIf="currentView === 'schedule'"></app-schedule>
   <app-users *ngIf="currentView === 'users'"></app-users>
   <app-gympackages *ngIf="currentView === 'packages'"></app-gympackages>
 

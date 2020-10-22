@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { GymService } from 'src/app/api/gym.service';
 import { IonSlides } from '@ionic/angular';
+import { SecurityService } from 'src/app/api/security.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-frontdesk',
@@ -10,9 +12,11 @@ import { IonSlides } from '@ionic/angular';
 export class FrontdeskPage implements OnInit {
 
   currentView = 'block';
-  data: any[] = [];
-  dataSearched: any[];
+  data: any;
+  dataSearched: any;
   currentDay = 0;
+  currentMenu: any;
+  currentUser: any;
 
   sliderConfig = {
     initialSlide: 0,
@@ -23,26 +27,14 @@ export class FrontdeskPage implements OnInit {
   generalSchedule: any;
   @ViewChild('slides', {static: false}) slides: IonSlides;
 
-  constructor(private gymService: GymService) { }
+  constructor(private gymService: GymService, private securityService: SecurityService, private router: Router) { }
 
 
   ngOnInit() {
-    this.data = this.gymService.getMembersList();
-    this.dataSearched = this.data;
+    this.currentUser = this.securityService.getCurrentLoggedUser();
+    this.currentMenu = this.securityService.getMenuByCurrentUserRole();
+
     this.generalSchedule = this.gymService.getGeneralSchedule();
-  }
-
-  searchMember(event) {
-
-    const val = event.target.value;
-
-    this.dataSearched = this.data;
-    if (val && val.trim() !== '' ) {
-      this.dataSearched = this.dataSearched.filter((item: any) => {
-        return (item.searchText.toLowerCase().indexOf(val.toLowerCase()) > -1);
-      });
-    }
-
   }
 
   goto(slideNumber) {
@@ -119,5 +111,32 @@ export class FrontdeskPage implements OnInit {
     return result;
 
   }
+
+  onMyProfile() {
+
+  }
+
+  onSelectedOption(option) {
+
+    console.log(option);
+
+    if (option === 'packages') {
+      this.router.navigate(['/packages']);
+    }
+    else if (option === 'schedule') {
+      this.router.navigate(['/schedule']);
+    }
+    else if (option === 'frontdesk') {
+      this.router.navigate(['/frontdesk']);
+    }
+    else if (option === 'admin') {
+      this.router.navigate(['/configuration']);
+    }
+    else if (option === 'sales') {
+      this.router.navigate(['/sales-report']);
+    }
+
+}
+
 
 }

@@ -4,6 +4,7 @@ import { IonSlides, ModalController } from '@ionic/angular';
 import { CheckinComponent } from '../checkin/checkin.component';
 import { ProfileComponent } from '../profile/profile.component';
 import { Router } from '@angular/router';
+import { SecurityService } from 'src/app/api/security.service';
 
 @Component({
   selector: 'app-schedule',
@@ -14,6 +15,7 @@ export class SchedulePage implements OnInit {
 
   currentDay = 0;
   scheduleCollapsed = false;
+  currentMenu: any;
 
   sliderConfig = {
     initialSlide: 0,
@@ -24,11 +26,14 @@ export class SchedulePage implements OnInit {
   memberSchedule: any;
   @ViewChild('slides', {static: false}) slides: IonSlides;
 
-  constructor(private gymService: GymService, private modalCtrl: ModalController, private router: Router) {
+  constructor(private gymService: GymService, private securityService: SecurityService,
+              private modalCtrl: ModalController, private router: Router) {
    }
 
   ngOnInit() {
     this.memberSchedule = this.gymService.getMemberSchedule(123);
+    this.currentMenu = this.securityService.getMenuByCurrentUserRole();
+    console.log(this.currentMenu);
   }
 
   checkScreen() {
@@ -105,6 +110,7 @@ export class SchedulePage implements OnInit {
 
   onSelectedOption(option) {
 
+      console.log(option);
 
       if (option === 'packages') {
         this.router.navigate(['/packages']);

@@ -8,53 +8,29 @@
 </ion-header>
 
 <ion-menu side="start" menuId="gymmenu" contentId="main">
-  <ion-header>
-    <ion-toolbar color="primary">
-      <img src="../../../assets/images/logo-footer.png"/>
-    </ion-toolbar>
-
-    <ion-card class="ios hydrated">
-      <img style="height: 100px;" src="https://theskincareedit.com/.image/t_share/MTU2ODk4NDM4MDIyODk5MTQ5/mila-kunis-young-hollywood-awards-2000.jpg">
-      <ion-card-header class="ion-inherit-color ios hydrated">
-        <ion-card-subtitle role="heading" aria-level="3" class="ion-inherit-color ios hydrated">Vencimiento: Nov 3, 2020</ion-card-subtitle>
-        <ion-card-title role="heading" aria-level="2" class="ion-inherit-color ios hydrated">Mila Kunis</ion-card-title>
-      </ion-card-header>
-      <ion-card-content class="ios card-content-ios hydrated">
-        <ion-item lines="none">
-          <ion-label>123456</ion-label>
-          <ion-label>Lady Fitness</ion-label>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
-
-  </ion-header>
   <ion-content>
-    <ion-list>
-      <ion-item button (click)="onMyProfile()">
-        <ion-icon slot="start" name="person-circle-outline"></ion-icon>
-        Mi Perfil
-      </ion-item>
-      <ion-item button (click)="onSelectedOption('packages')">
-        <ion-icon slot="start" name="albums-outline"></ion-icon>
-        Paquetes
-      </ion-item>
-      <ion-item button (click)="onSelectedOption('schedule')">
-        <ion-icon slot="start" name="alarm-outline"></ion-icon>
-        Agenda
-      </ion-item>
-      <ion-item button (click)="onSelectedOption('frontdesk')">
-        <ion-icon slot="start" name="alarm-outline"></ion-icon>
-        Mostrador
-      </ion-item>
-      <ion-item button (click)="onSelectedOption('admin')">
-        <ion-icon slot="start" name="cog-outline"></ion-icon>
-        Administrador
-      </ion-item>
-      <ion-item button (click)="onSelectedOption('sales')">
-        <ion-icon slot="start" name="cash-outline"></ion-icon>
-        Reporte de Ventas
+    <div class="menu-header-bg"></div>
+    <div class="header-content">
+      <img src="https://i.pinimg.com/originals/c3/45/05/c34505eb63edc65300a690f1ad903799.jpg" alt="">
+      <ion-label>
+        <h2>Mila Kunis</h2>
+        <p>Socio: 12345</p>
+        <p><ion-badge color="light">Administrador</ion-badge></p>
+      </ion-label>
+    </div>
+    <div class="action-button">
+      <ion-button (click)="onMyProfile()">
+        <ion-icon name="create-outline"></ion-icon>
+        Editar</ion-button>
+    </div>
+
+    <ion-list class="menu-items" lines="none">
+      <ion-item *ngFor="let mnu of currentMenu" button transparent (click)="onSelectedOption(mnu.option)">
+        <ion-icon slot="start" color="gym-primary" name="{{mnu.icon}}"></ion-icon>
+        <ion-label color="gym-primary">{{mnu.displayName}}</ion-label>
       </ion-item>
     </ion-list>
+
   </ion-content>
 </ion-menu>
 

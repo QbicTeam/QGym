@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { ModalController, AngularDelegate } from '@ionic/angular';
 import { NgForm } from '@angular/forms';
+import { GymService } from 'src/app/api/gym.service';
+import { SharedService } from 'src/app/api/shared.service';
 
 @Component({
   selector: 'app-capacity-modal',
@@ -18,7 +20,7 @@ export class CapacityModalComponent implements OnInit {
   startDate: Date = this.todayDate;
   endDate: Date = this.startDate;
 
-  constructor(private modalCtrl: ModalController) { }
+  constructor(private modalCtrl: ModalController, private gymService: GymService, private sharedService: SharedService) { }
 
   ngOnInit() {}
 
@@ -36,7 +38,6 @@ export class CapacityModalComponent implements OnInit {
   }
 
   onSetStartDate() {
-    console.log('date changed...', this.startDate);
 
     const date1 = new Date(this.startDate);
     const date2 = new Date(this.endDate);
@@ -45,5 +46,12 @@ export class CapacityModalComponent implements OnInit {
       this.endDate = this.startDate;
     }
 
+  }
+
+  onAddAuthorizedCapacity() {
+    this.gymService.addAuthorizedCapacity(this.startDate, this.endDate, this.allowedPercentage, this.allowedPeople).subscribe(() => {
+      this.sharedService.setConfigurationSelection('ocupation');
+      this.modalCtrl.dismiss();
+    });
   }
 }

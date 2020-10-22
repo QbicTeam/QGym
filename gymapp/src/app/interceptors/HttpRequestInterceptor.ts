@@ -12,6 +12,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
+
         this.loadingCtrl.getTop().then(hasLoading => {
             if (!hasLoading) {
                 this.loadingCtrl.create({
@@ -35,23 +36,6 @@ export class HttpRequestInterceptor implements HttpInterceptor {
             })
         );
 
-        // return next.handle(request).pipe(
-        //     finalize(() => {
-        //         this.loadingCtrl.getTop().then(hasLoading => {
-        //             if (hasLoading) {
-        //                 this.loadingCtrl.dismiss();
-        //             }
-        //         });
-        //     })
-        // );
-
-        // return next.handle(request).pipe(
-        //     retryWhen(err => {
-
-        //     })
-        // );
-
-        return EMPTY;
     }
 
     async presentFailedAlert(msg) {
@@ -63,4 +47,5 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
         (await alert).present();
     }
+
 }

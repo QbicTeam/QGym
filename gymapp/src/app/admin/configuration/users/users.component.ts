@@ -10,14 +10,17 @@ import { UsersModalComponent } from '../users-modal/users-modal.component';
 })
 export class UsersComponent implements OnInit {
 
-  data: any[] = [];
-  dataSearched: any[];
+  data: any;
+  dataSearched: any;
 
   constructor(private gymService: GymService, private modalCtrl: ModalController) { }
 
   ngOnInit() {
-    this.data = this.gymService.getMembersList();
-    this.dataSearched = this.data;
+    this.gymService.getMembersList().subscribe(response => {
+      this.data = response;
+      this.dataSearched = this.data;
+    });
+
   }
 
   searchMember(event) {

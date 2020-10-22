@@ -4,7 +4,11 @@
 
 export const environment = {
   production: false,
-  apiurl: 'http://majahide-001-site1.itempurl.com/releasecandidates/GymAPI/'
+  apiurl: 'http://majahide-001-site1.itempurl.com/releasecandidates/GymAPI/',
+  photosAPIUrl: 'http://majahide-001-site1.itempurl.com/releasecandidates/PhotosManagerAPI/',
+  profilesPhotosRepoUrl: 'http://majahide-001-site1.itempurl.com/releasecandidates/PhotosManagerAPI/prometheusmedia/',
+  profilesPhotosProjectName: 'gymfitness',
+  profilesPhotosFolderName: 'profiles'
 };
 
 /*

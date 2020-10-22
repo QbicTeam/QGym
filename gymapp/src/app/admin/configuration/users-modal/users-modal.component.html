@@ -11,19 +11,21 @@
 
 <ion-content class="ion-padding">
 
+  <!-- temp -->
+
+  <!-- end temp -->
+  
   <ion-list>
     <ion-item>
 
-        <label for="files" class="selectImage">Seleccionar Foto</label>
-        <input id="files" style="display:none;" type="file">
-
+        <label for="file" class="selectImage">Seleccionar Foto</label>
+        <input type="file" id="file" ng2FileSelect [uploader]="uploader" />  
     </ion-item>
-    <ion-item>
-      <!-- <ion-thumbnail>
-        <img src="https://i.pinimg.com/564x/33/39/fc/3339fca84ea04f3623285d1bfc6be410.jpg">
-      </ion-thumbnail> -->
+    <ion-item lines="none">{{ currentFileName }}</ion-item>
 
-      <img src="https://i.pinimg.com/564x/33/39/fc/3339fca84ea04f3623285d1bfc6be410.jpg">
+    <ion-item>
+
+      <img src="{{currentUserPhoto}}">
 
     </ion-item>
     <ion-item transparent>
@@ -65,6 +67,6 @@
 
 
   </ion-list>
-  <ion-button expand="block" fill="outline">Grabar</ion-button>
+  <ion-button expand="block" (click)="onSaveProfileData()" fill="outline">Grabar</ion-button>
 
 </ion-content>

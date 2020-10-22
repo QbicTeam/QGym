@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
+import { SecurityService } from 'src/app/api/security.service';
 
 @Component({
   selector: 'app-member',
@@ -12,6 +13,7 @@ export class MemberPage implements OnInit {
   memberFound = false;
   memberName = '';
   memberEmail = '';
+  fullMemberEmail = '';
   optionsSelection = [];
   selectedOption;
 
@@ -21,7 +23,8 @@ export class MemberPage implements OnInit {
 
   identityForm = new FormGroup({
     response: new FormControl('', Validators.required),
-    email: new FormControl('', Validators.required)
+    email: new FormControl('', [Validators.required,
+      Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')])
   });
 
   confirmationCodeForm = this.formBuilder.group({
@@ -32,38 +35,50 @@ export class MemberPage implements OnInit {
   }, { validators: [this.confirmationCodeMatchValidator, this.passwordMatchValidator ]});
 
 
-  constructor(private formBuilder: FormBuilder, private router: Router) { }
+  constructor(private formBuilder: FormBuilder, private router: Router, private securityService: SecurityService) { }
 
   ngOnInit() {
   }
 
   onValidateMember() {
 
-    this.memberFound = true;
-    this.memberName = 'Majahide Payan Hz';
+    this.securityService.getUserDataForRegisterByMemberId(this.memberForm.value.memberId).subscribe(response => {
 
-    const rnd = Math.floor(Math.random() * Math.floor(2));
-    console.log('Validating member...', rnd);
+      this.memberFound = true;
+      this.memberName = response.displayName;
 
-    if (rnd === 0) {
+      if (!response.email) {
 
-      this.memberEmail = '';
-      this.optionsSelection = [ 'Telefono', 'Paquete', 'Edad'];
-      this.selectedOption = this.optionsSelection[0];
+        this.memberEmail = '';
+        this.optionsSelection = response.validationTypes;
+        this.selectedOption = this.optionsSelection[0];
 
-    } else {
+      } else {
 
-      this.memberEmail = 'maj***********@hotmail.com';
-      this.confirmationCodeForm.patchValue({confirmationCodeSent : 12345 });
-    }
+        this.memberEmail = response.emailObfuscated;
+        this.fullMemberEmail = response.email;
+        this.confirmationCodeForm.patchValue({confirmationCodeSent : response.confirmationCode });
+
+      }
+
+    });
+
   }
 
   onIdentityConfirmation() {
-    console.log('identity validation...');
-    this.memberEmail = 'maj***********@hotmail.com';
 
-    this.confirmationCodeForm.patchValue({confirmationCodeSent : 12345 });
 
+    this.securityService.confirmIdentityForRegister(this.memberForm.value.memberId,
+      this.identityForm.value.email, this.selectedOption, this.identityForm.value.response). subscribe(response => {
+
+        if (!this.identityForm.value.email || this.identityForm.value.email !== '') {
+          this.memberEmail = this.identityForm.value.email;
+          this.fullMemberEmail = this.memberEmail;
+        }
+
+        this.confirmationCodeForm.patchValue({confirmationCodeSent : response });
+
+      });
 
   }
 
@@ -76,6 +91,46 @@ export class MemberPage implements OnInit {
   }
 
   onRegisterMember() {
-    this.router.navigate(['/schedule']);
+
+    if (!this.memberEmail || this.memberEmail === '') {
+      this.securityService.registerCurrentMember(this.memberForm.value.memberId, this.fullMemberEmail,
+        this.confirmationCodeForm.value.password).subscribe(response => {
+
+          this.login(this.fullMemberEmail, this.confirmationCodeForm.value.password);
+
+        });
+    } else {
+
+      this.securityService.resetPassword(this.fullMemberEmail, this.confirmationCodeForm.value.password).subscribe(response => {
+
+        this.login(this.fullMemberEmail, this.confirmationCodeForm.value.password);
+
+      });
+
+    }
   }
+
+  login(email, password) {
+
+    this.securityService.login(email, password).subscribe(response => {
+
+      const userLogged = this.securityService.getCurrentLoggedUser();
+
+      if (userLogged) {
+
+        if (userLogged.role.toLowerCase() === 'miembro') {
+
+          if (this.securityService.checkExpiration()) {
+            this.router.navigate(['/schedule']);
+          }
+
+        } else if (userLogged.role.toLowerCase() === 'admin') {
+          this.router.navigate(['/frontdesk']);
+        }
+      }
+
+    });
+
+  }
+
 }

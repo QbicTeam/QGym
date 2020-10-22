@@ -22,20 +22,26 @@ export class LoginPage implements OnInit {
   }
 
   onLogin() {
-    console.log('Form:', this.loginForm.value);
-    console.log(this.loginForm.value.email);
 
     this.securityService.login(this.loginForm.value.email, this.loginForm.value.password).subscribe(response => {
-      console.log(response);
-      // TODO: Determinar el tipo de usuario, meter el token en el storage, que pasa si la vigencia esta caducada?
+
+      const userLogged = this.securityService.getCurrentLoggedUser();
+
+      if (userLogged) {
+
+        if (userLogged.role.toLowerCase() === 'miembro') {
+
+          if (this.securityService.checkExpiration()) {
+            this.router.navigate(['/schedule']);
+          }
+
+        } else if (userLogged.role.toLowerCase() === 'admin') {
+          this.router.navigate(['/frontdesk']);
+        }
+      }
+
     });
 
-    // // this.showToast();
-    // if (this.loginForm.value.email === 'gerardo@domain.com') {
-    //   this.router.navigate(['/frontdesk']);
-    // } else {
-    //   this.router.navigate(['/schedule']);
-    // }
   }
 
   async showToast() {
