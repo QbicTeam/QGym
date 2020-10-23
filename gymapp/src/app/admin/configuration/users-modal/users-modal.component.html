@@ -11,34 +11,49 @@
 
 <ion-content class="ion-padding">
 
-  <!-- temp -->
+  <div *ngIf="memberDetails">
 
-  <!-- end temp -->
   
   <ion-list>
     <ion-item>
-
         <label for="file" class="selectImage">Seleccionar Foto</label>
         <input type="file" id="file" ng2FileSelect [uploader]="uploader" />  
     </ion-item>
     <ion-item lines="none">{{ currentFileName }}</ion-item>
 
-    <ion-item>
 
-      <img src="{{currentUserPhoto}}">
+    <ion-grid>
+      <ion-row>
+      <ion-col class='imageContainer'>
+        <img src="{{currentUserPhoto}}">
+      </ion-col>
+      <ion-col>
 
-    </ion-item>
-    <ion-item transparent>
-        <ion-label position="floating">No. Socio</ion-label>
-        <ion-input placeholder="Introducir el numero de socio" type="text"></ion-input>
-    </ion-item>
+        <ion-item transparent>
+          <ion-label position="floating">No. Socio</ion-label>
+          <ion-input [disabled]="!isMemberIdEditable" [(ngModel)]="memberDetails.memberId" placeholder="Introducir el numero de socio" type="text"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-chip *ngIf="memberDetails.isBlock" color="danger">Bloqueado</ion-chip>
+          <ion-chip *ngIf="!memberDetails.isBlock" color="success">Activo</ion-chip>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Verificado</ion-label>
+          <ion-checkbox slot="end" [(ngModel)]="memberDetails.isVerified"></ion-checkbox>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    </ion-grid>
+
     <ion-item transparent>
       <ion-label position="floating">Nombre</ion-label>
-      <ion-input placeholder="Nombre completo" type="text"></ion-input>
+      <ion-input [(ngModel)]="memberDetails.fullName" placeholder="Nombre completo" type="text"></ion-input>
    </ion-item>
    <ion-item transparent>
       <ion-label position="floating">Correo Electronico</ion-label>
-      <ion-input placeholder="Capturar un correo electronico" type="text"></ion-input>
+      <ion-input disabled [(ngModel)]="memberDetails.email" placeholder="Capturar un correo electronico" type="text"></ion-input>
    </ion-item>
 
    <ion-list-header class="ios hydrated">
@@ -56,17 +71,15 @@
   </ion-item>
 
   <ion-item transparent>
-    <ion-label>Paquetes: </ion-label>
-    <ion-select placeholder="Seleccionar Opcion">
-      <ion-select-option>Familiar</ion-select-option>
-      <ion-select-option>Estudiante</ion-select-option>
-      <ion-select-option>Femenil</ion-select-option>
-      <ion-select-option>Normal</ion-select-option>
-    </ion-select>
+    <ion-label slot="start">Paquete: </ion-label>
+    <ion-label>{{memberDetails.membershipTypeActive?.name}}</ion-label>
+    <ion-label slot="end">{{memberDetails.membershipExpiration | date:'MMM dd, yyyy' }}</ion-label>
   </ion-item>
 
 
   </ion-list>
   <ion-button expand="block" (click)="onSaveProfileData()" fill="outline">Grabar</ion-button>
+
+</div>
 
 </ion-content>

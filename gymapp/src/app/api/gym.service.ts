@@ -1,6 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { DownloadSalesReportResponseDTO } from '../_models/DownloadSalesReportReponseDTO';
+import { PackageFullDescriptionResponseDTO } from '../_models/PackageFullDescriptionResponseDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +14,16 @@ export class GymService {
 
   constructor(private http: HttpClient) { }
 
-  getMembersList() {
+  getActiveMembersList() {
 
     const url = this.baseUrl + 'members/valid';
+
+    return this.http.get(url);
+  }
+
+  getMembersList() {
+
+    const url = this.baseUrl + 'members';
 
     return this.http.get(url);
   }
@@ -80,87 +90,121 @@ export class GymService {
 
   }
 
-  getMembersDetailsList() {
+  getMemberDetailsById(id) {
 
-    const data = [
-      {
-        memberId: 12345,
-        fullName: 'Camila Sodi',
-        email: 'camilasodi@gmail.com',
-        package: 'Familiar',
-        period: '12 days',
-        dueDate: 'Nov 12, 2020',
-        photoUrl: 'https://image.shutterstock.com/image-photo/beauty-asian-woman-face-portrait-260nw-607071935.jpg',
-        searchText: '12345 Camila Sodi camilasodi@gmail.com'
-      },
-      {
-        memberId: 67890,
-        fullName: 'Emma artenton',
-        email: 'emma@hotmail.com',
-        package: 'Personal',
-        period: '20 days',
-        dueDate: 'Oct 12, 2020',
-        photoUrl: 'https://thumbs.dreamstime.com/b/beauty-woman-face-portrait-beautiful-spa-model-girl-perfect-fresh-clean-skin-youth-skin-care-concept-brunette-female-63494003.jpg',
-        searchText: '67890 Emma artenton emma@hotmail.com'
-      },
-      {
-        memberId: 24680,
-        fullName: 'Anne Hateway',
-        email: 'anne@gmail.com',
-        package: 'Femenil',
-        period: '9 days',
-        dueDate: 'Sep 20, 2020',
-        photoUrl: 'https://banner2.cleanpng.com/20180723/lho/kisspng-plastic-surgery-cosmetics-woman-face-skin-care-model-5b5605a8b02fd8.3457753715323642007217.jpg',
-        searchText: '24680 Anne Hateway anne@gmail.com'
-      },
-    ];
+    const url = this.baseUrl + 'members/' + id + '/details/complete';
 
-    return data;
+    return this.http.get(url);
+  }
+
+  updateMemberData(memberData: any) {
+
+    const url = this.baseUrl + 'members/' + memberData.userId;
+
+    return this.http.put(url, memberData);
 
   }
 
+  // getMembersDetailsList() {
 
-  getCapacityList() {
+  //   const data = [
+  //     {
+  //       memberId: 12345,
+  //       fullName: 'Camila Sodi',
+  //       email: 'camilasodi@gmail.com',
+  //       package: 'Familiar',
+  //       period: '12 days',
+  //       dueDate: 'Nov 12, 2020',
+  //       photoUrl: 'https://image.shutterstock.com/image-photo/beauty-asian-woman-face-portrait-260nw-607071935.jpg',
+  //       searchText: '12345 Camila Sodi camilasodi@gmail.com'
+  //     },
+  //     {
+  //       memberId: 67890,
+  //       fullName: 'Emma artenton',
+  //       email: 'emma@hotmail.com',
+  //       package: 'Personal',
+  //       period: '20 days',
+  //       dueDate: 'Oct 12, 2020',
+  // tslint:disable-next-line:max-line-length
+  //       photoUrl: 'https://thumbs.dreamstime.com/b/beauty-woman-face-portrait-beautiful-spa-model-girl-perfect-fresh-clean-skin-youth-skin-care-concept-brunette-female-63494003.jpg',
+  //       searchText: '67890 Emma artenton emma@hotmail.com'
+  //     },
+  //     {
+  //       memberId: 24680,
+  //       fullName: 'Anne Hateway',
+  //       email: 'anne@gmail.com',
+  //       package: 'Femenil',
+  //       period: '9 days',
+  //       dueDate: 'Sep 20, 2020',
+  // tslint:disable-next-line:max-line-length
+  //       photoUrl: 'https://banner2.cleanpng.com/20180723/lho/kisspng-plastic-surgery-cosmetics-woman-face-skin-care-model-5b5605a8b02fd8.3457753715323642007217.jpg',
+  //       searchText: '24680 Anne Hateway anne@gmail.com'
+  //     },
+  //   ];
 
-    const data = [
-      {
-        startDate: '01/Jun/2020',
-        endDate: '01/Ago/2020',
-        percentage: 30,
-        totalUsers: 40,
-        remainingDays: -20
-      },
-      {
-        startDate: '02/Ago/2020',
-        endDate: '01/Dic/2020',
-        percentage: 50,
-        totalUsers: 80,
-        remainingDays: 100
-      }
+  //   return data;
 
-    ];
+  // }
 
-    return data;
-  }
+
+  // getCapacityList() {
+
+  //   const data = [
+  //     {
+  //       startDate: '01/Jun/2020',
+  //       endDate: '01/Ago/2020',
+  //       percentage: 30,
+  //       totalUsers: 40,
+  //       remainingDays: -20
+  //     },
+  //     {
+  //       startDate: '02/Ago/2020',
+  //       endDate: '01/Dic/2020',
+  //       percentage: 50,
+  //       totalUsers: 80,
+  //       remainingDays: 100
+  //     }
+
+  //   ];
+
+  //   return data;
+  // }
 
   getPackagesList() {
-    const data = [
-      {
-        packageId: 12345,
-        name: 'Familiar',
-        period: '7 Dias',
-        isActive: true
-      },
-      {
-        packageId: 67890,
-        name: 'Especial',
-        period: '100 Dias',
-        isActive: false
-      }
-    ];
 
-    return data;
+    const url = this.baseUrl + 'packages';
+
+    return this.http.get(url);
+
   }
+
+  getPackageFullDetailsById(pkgId: any) {
+
+    const url = this.baseUrl + 'packages/' + pkgId;
+
+    return this.http.get(url);
+  }
+
+  updatePackageById(pkgId: any, pkg: any) {
+
+    const url = this.baseUrl + 'packages/' + pkgId;
+
+    return this.http.put(url, pkg);
+
+  }
+
+  addNewPackage(pkg: any) {
+
+    const url = this.baseUrl + 'packages';
+
+    return this.http.post(url, pkg);
+
+  }
+
+
+
+
+
 
   getMemberSchedule(memberId: number) {
 
@@ -371,142 +415,54 @@ export class GymService {
 
   }
 
-  getPackagesListInfo() {
+  getPackagesListInfo(): Observable<Array<any>> {
 
-    const data = [
-      {
-        id: 12345,
-        price: 120,
-        period: '10 dias',
-        shortDescription: '<div style="position: relative; text-align: center; color: #000;"><img src="../../assets/images/slider-accesototal.jpg"><div style="position: absolute; bottom: 40px; left: 16px; font-size: 38px; font-weight: 700; font-family: \'Montserrat\';">Acceso Total</div><div style="position: absolute; bottom: 100px; left: 16px; font-size: 30px; font-weight: 500; font-family: \'Montserrat\';">PLAN MENSUAL</div><div><a style="position: absolute; bottom: 150px; left: 16px;" target="_blank" href="https://www.redalyc.org/pdf/1794/179454112005.pdf">Descargar</a></div></div>'
-      },
-      {
-        id: 23456,
-        price: 60,
-        period: '20 dias',
-        shortDescription: '<div style="position: relative; text-align: center; color: #000;"><img src="../../assets/images/slider-estudiante.jpg"><div style="position: absolute; bottom: 40px; left: 16px; font-size: 38px; font-weight: 700; font-family: \'Montserrat\';">Estudiante</div><div style="position: absolute; bottom: 100px; left: 16px; font-size: 30px; font-weight: 500; font-family: \'Montserrat\';">PLAN MENSUAL</div><div><a style="position: absolute; bottom: 150px; left: 16px;" target="_blank" href="https://www.redalyc.org/pdf/206/20611455003.pdf">Descargar</a></div></div>'
-      },
-      {
-        id: 34567,
-        price: 34,
-        period: '45 dias',
-        shortDescription: '<div style="position: relative; text-align: center; color: #000;"><img src="../../assets/images/slider-familiar.jpg"><div style="position: absolute; bottom: 40px; left: 16px; font-size: 38px; font-weight: 700; font-family: \'Montserrat\';">Familiar</div><div style="position: absolute; bottom: 100px; left: 16px; font-size: 30px; font-weight: 500; font-family: \'Montserrat\';">PLAN MENSUAL</div></div>'
-      },
-      {
-        id: 45678,
-        price: 45,
-        period: '43 dias',
-        shortDescription: '<div style="position: relative; text-align: center; color: #000;"><img src="../../assets/images/slider-ladyfitness.jpg"><div style="position: absolute; bottom: 40px; left: 16px; font-size: 38px; font-weight: 700; font-family: \'Montserrat\';">Lady Fitness</div><div style="position: absolute; bottom: 100px; left: 16px; font-size: 30px; font-weight: 500; font-family: \'Montserrat\';">PLAN MENSUAL</div></div>'
-      },
-      {
-        id: 56789,
-        price: 450,
-        period: '100 dias',
-        shortDescription: '<div style="position: relative; text-align: center; color: #000;"><img src="../../assets/images/plan-ejecutivo.jpg"><div style="position: absolute; bottom: 40px; left: 16px; font-size: 38px; font-weight: 700; font-family: \'Montserrat\';">Plan Ejecutivo</div><div style="position: absolute; bottom: 100px; left: 16px; font-size: 30px; font-weight: 500; font-family: \'Montserrat\';">PLAN MENSUAL</div></div>'
-      }
-    ];
+    const url = this.baseUrl + 'packages/actives';
 
-
-    return data;
+    return this.http.get<Array<any>>(url);
 
   }
 
-  getPackageDetails(idPackage: number) {
+  getPackageDetails(idPackage: number): Observable<PackageFullDescriptionResponseDTO> {
 
-    let data = '<ion-grid>';
+    const url = this.baseUrl + 'packages/' + idPackage + '/fullDescription';
 
-    data = data + '<ion-row>';
-    data = data + '<ion-col size-xs="12" size-sm="8">';
-    data = data + '<ion-grid>';
-    data = data + '<ion-row>';
-    data = data + '<h1 style="color:black;">¿QUÉ ES ACCESO TOTAL?</h1>';
-    data = data + '</ion-row>';
-    data = data + '<ion-row>';
-    data = data + '<ion-col>';
-    data = data + '<p style="color:black;" align="justify">El plan mensual <b>“ACCESO TOTAL”</b> como su nombre lo dice, te permite el acceso sin restricciones a todas las áreas del gimnasio. Aparatos, instructores, clases, regaderas, lockers, sauna, etc. </p>';
-    data = data + '<p style="color:black;" align="justify">Puedes hacer uso de todo el equipo e instalaciones el día y a la hora que tú quieras dentro de nuestro horario de operación.</p>';
-    data = data + '<p style="color:black;" align="justify">También, si tienes hijos incluye el servicio de guardería sin ningún costo adicional.</p>';
-    data = data + '</ion-col>';
-    data = data + '</ion-row>';
-    data = data + '<ion-row>';
-    data = data + '<h1 style="color: black;">¿QUÉ INCLUYE?</h1>';
-    data = data + '</ion-row>';
-    data = data + '<ion-row>';
-    data = data + '<ion-col>';
-    data = data + '<ion-item lines="none">';
-    data = data + '<ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>';
-    data = data + '<ion-label>APARATOS</ion-label>';
-    data = data + '</ion-item>';
-    data = data + '</ion-col>';
-    data = data + '<ion-col>';
-    data = data + '<ion-item lines="none">';
-    data = data + '<ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>';
-    data = data + '<ion-label>INSTRUCTOR</ion-label>';
-    data = data + '</ion-item>';
-    data = data + '</ion-col>';
-    data = data + '<ion-col>';
-    data = data + '<ion-item lines="none">';
-    data = data + '<ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>';
-    data = data + '<ion-label>REGADERAS</ion-label>';
-    data = data + '</ion-item>';
-    data = data + '</ion-col>';
-    data = data + '<ion-col>';
-    data = data + '<ion-item lines="none">';
-    data = data + '<ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>';
-    data = data + '<ion-label>SAUNA</ion-label>';
-    data = data + '</ion-item>';
-    data = data + '</ion-col>';
-    data = data + '<ion-col>';
-    data = data + '<ion-item lines="none">';
-    data = data + '<ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>';
-    data = data + '<ion-label>LOCKERS</ion-label>';
-    data = data + '</ion-item>';
-    data = data + '</ion-col>';
-    data = data + '<ion-col>';
-    data = data + '<ion-item lines="none">';
-    data = data + '<ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>';
-    data = data + '<ion-label>GUARDERÍA</ion-label>';
-    data = data + '</ion-item>';
-    data = data + '</ion-col>';
-    data = data + '</ion-row>';
-    data = data + '</ion-grid>';
-    data = data + '</ion-col>';
-    data = data + '<ion-col>';
-    data = data + '<img src="../../assets/images/img-accesototal.png"/>';
-    data = data + '</ion-col>';
-    data = data + '</ion-row>';
-    data = data + '</ion-grid>';
-
-    return data;
+    return this.http.get<PackageFullDescriptionResponseDTO>(url);
   }
 
-  getSalesReport(initDate: any, endDate: any) {
+  getSalesReport(initDate: Date, endDate: Date) {
 
-    const data = [
-      {
-        saleDate: new Date(2020, 11, 1),
-        fullName: 'Mila Kunis',
-        gender: 'Femenino',
-        birthDate: new Date(1983, 8, 1),
-        phone: '664 689-8989',
-        membershipType: 'Familiar',
-        memberId: 12345,
-        vigency: new Date(2020, 12, 1)
-      },
-      {
-        saleDate: new Date(2020, 10, 2),
-        fullName: 'Jennifer Lawrence',
-        gender: 'Femenino',
-        birthDate: new Date(1990, 8, 15),
-        phone: '664 689-2323',
-        membershipType: 'Lady Fitness',
-        memberId: 67890,
-        vigency: new Date(2020, 12, 20)
-      }
+    const startMonth = '00' + initDate.getMonth();
+    const startDay = '00' + initDate.getDate();
 
-    ];
+    const endMonth = '00' + endDate.getMonth();
+    const endDay = '00' + endDate.getDate();
 
-    return data;
+    const startDate = initDate.getFullYear() + startMonth.substring(startMonth.length - 2) + startDay.substring(startDay.length - 2);
+    const finalDate = endDate.getFullYear() + endMonth.substring(endMonth.length - 2) + endDay.substring(endDay.length - 2);
+
+
+    const url = this.baseUrl + 'sales/report/' + startDate + '/' + finalDate;
+
+    return this.http.get(url);
   }
 
+  getSalesReportForDownload(initDate: Date, endDate: Date): Observable<DownloadSalesReportResponseDTO> {
+
+    const startMonth = '00' + initDate.getMonth();
+    const startDay = '00' + initDate.getDate();
+
+    const endMonth = '00' + endDate.getMonth();
+    const endDay = '00' + endDate.getDate();
+
+    const startDate = initDate.getFullYear() + startMonth.substring(startMonth.length - 2) + startDay.substring(startDay.length - 2);
+    const finalDate = endDate.getFullYear() + endMonth.substring(endMonth.length - 2) + endDay.substring(endDay.length - 2);
+
+
+    const url = this.baseUrl + 'sales/report/' + startDate + '/' + finalDate + '/download';
+
+
+    return this.http.get<DownloadSalesReportResponseDTO>(url);
+
+  }
 }

@@ -4,11 +4,11 @@
     Paquetes
   </ion-list-header>
 
-  <ion-item button *ngFor="let itm of data" class="item ios in-list ion-focusable hydrated item-label">
+  <ion-item button (click)="openModal(itm)" *ngFor="let itm of data" class="item ios in-list ion-focusable hydrated item-label">
     <ion-label class="sc-ion-label-ios-h sc-ion-label-ios-s ios hydrated">
-      <h2>{{itm.packageId}}</h2>
+      <h2>ID: {{itm.id}}</h2>
       <h3>{{itm.name}}</h3>
-      <p>{{itm.period}}
+      <p>{{itm.periodicityDays}} dia(s)
         <ion-chip *ngIf="itm.isActive" color="success">Activo</ion-chip> 
         <ion-chip *ngIf="!itm.isActive" color="danger">No Activo</ion-chip>
       </p>

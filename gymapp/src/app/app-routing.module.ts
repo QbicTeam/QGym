@@ -56,11 +56,11 @@ const routes: Routes = [
     loadChildren: () => import('./pkgs/packages/packages.module').then( m => m.PackagesPageModule)
   },
   {
-    path: 'package-detail',
+    path: 'package-detail/:pkgid/:name/:price',
     loadChildren: () => import('./pkgs/package-detail/package-detail.module').then( m => m.PackageDetailPageModule)
   },
   {
-    path: 'payment',
+    path: 'payment/:pkgid/:name/:price',
     loadChildren: () => import('./pkgs/payment/payment.module').then( m => m.PaymentPageModule)
   },
   {

@@ -16,8 +16,8 @@ export class SelectmemberModalComponent implements OnInit {
 
   ngOnInit() {
 
-    this.data = this.gymService.getMembersDetailsList();
-    this.dataSearched = this.data;
+    // this.data = this.gymService.getMembersDetailsList();
+    // this.dataSearched = this.data;
 
   }
 

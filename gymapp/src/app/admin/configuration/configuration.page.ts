@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { GymService } from 'src/app/api/gym.service';
 import { SecurityService } from 'src/app/api/security.service';
 import { SharedService } from 'src/app/api/shared.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-configuration',
@@ -11,12 +12,18 @@ import { SharedService } from 'src/app/api/shared.service';
 })
 export class ConfigurationPage implements OnInit {
 
+  basePhotosUrl = environment.profilesPhotosRepoUrl + environment.profilesPhotosProjectName + '/' + environment.profilesPhotosFolderName + '/';
+
+
   currentMenu: any;
   currentUser: any;
 
   currentView = 'block';
   data: any;
   dataSearched: any;
+
+  membersData: any;
+  membersDataSearched: any;
 
   capacityData: any;
   scheduleData: any;
@@ -50,6 +57,10 @@ export class ConfigurationPage implements OnInit {
 
   }
 
+  onMyProfile() {
+
+  }
+
   onOptionSelected() {
     console.log(this.currentView);
     if (this.currentView === 'block') {
@@ -58,8 +69,8 @@ export class ConfigurationPage implements OnInit {
       this.loadCapacityData();
     } else if (this.currentView === 'schedule') {
       this.loadScheduleData();
-    } else if (this.currentView === 'users') {
-      this.loadUsersData();
+    // } else if (this.currentView === 'users') {
+    //   this.loadUsersData();
     } else if (this.currentView === 'packages') {
       this.loadMembershipsData();
     }
@@ -71,7 +82,7 @@ export class ConfigurationPage implements OnInit {
 
   loadActiveMemberList() {
 
-    this.gymService.getMembersList().subscribe(response => {
+    this.gymService.getActiveMembersList().subscribe(response => {
 
       this.data = response;
       this.dataSearched = this.data;
@@ -94,16 +105,17 @@ export class ConfigurationPage implements OnInit {
   }
 
   loadUsersData() {
-    console.log('loading users data');
+    // this.gymService.getMembersList().subscribe(response => {
+    //   console.log('Users list members retrieved...');
+    //   this.membersData = response;
+    //   this.membersDataSearched = this.data;
+    // });
   }
 
   loadMembershipsData() {
     console.log('loading memberships data...');
   }
 
-  onMyProfile() {
-
-  }
 
   onSelectedOption(option) {
 
