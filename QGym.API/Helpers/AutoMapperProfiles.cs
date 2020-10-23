@@ -46,7 +46,7 @@ namespace QGym.API.Helpers
                      opt.MapFrom(src => src.Id);
                  });
             */
-
+            // MemberToListDTO
             CreateMap<Member, MemberToListDTO>()
                 .ForMember(dest => dest.Email, opt => {
                     opt.MapFrom(src => src.User.UserName);
@@ -56,6 +56,9 @@ namespace QGym.API.Helpers
                 })
                 .ForMember(dest => dest.SearchText, opt => {
                     opt.MapFrom(src => src.MemberId + " " + src.User.DisplayName + " " + src.User.UserName);
+                })
+                .ForMember(dest => dest.UserId, opt => {
+                    opt.MapFrom(src => src.User.Id);
                 });
 
             CreateMap<Member, MemberForBlockDTO>()
@@ -67,6 +70,9 @@ namespace QGym.API.Helpers
                 })
                 .ForMember(dest => dest.FullName, opt => {
                     opt.MapFrom(src => src.User.DisplayName);
+                })
+                .ForMember(dest => dest.UserId, opt => {
+                    opt.MapFrom(src => src.User.Id);
                 });
 
             CreateMap<Member, MemberDTO>()
@@ -87,6 +93,9 @@ namespace QGym.API.Helpers
                 })
                 .ForMember(dest => dest.RoleName, opt => {
                     opt.MapFrom(src => src.User.Role.DisplayName);
+                })
+                .ForMember(dest => dest.UserId, opt => {
+                    opt.MapFrom(src => src.User.Id);
                 });
             
             CreateMap<Member, MembersDetailsDTO>()
@@ -104,6 +113,9 @@ namespace QGym.API.Helpers
                 })
                 .ForMember(dest => dest.DueDate, opt => {
                     opt.MapFrom(src => src.MembershipExpiration);
+                })
+                .ForMember(dest => dest.UserId, opt => {
+                    opt.MapFrom(src => src.User.Id);
                 });
 
             CreateMap<AuthorizedCapacity, AuthorizedCapacityDTO>();

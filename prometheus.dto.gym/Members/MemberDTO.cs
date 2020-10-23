@@ -9,6 +9,7 @@ namespace prometheus.dto.gym.Members
     {
         public int Id { get; set; }
         //-- User
+        public int UserId { get; set; }
         public string Email { get; set; }
         public string FullName { get; set; } // fullName  - Anterior: DisplayName
         public bool IsBlock { get; set; } // IsActive

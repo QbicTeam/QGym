@@ -11,6 +11,7 @@ namespace prometheus.dto.gym.Members
         public string Email { get; set; }
         public string PhotoUrl { get; set; }
         public string SearchText { get; set; }
+        public int UserId { get; set; }
 
     }
 }

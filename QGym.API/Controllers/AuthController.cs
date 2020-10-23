@@ -96,8 +96,9 @@ namespace QGym.API.Controllers
 
                 // Create a Member
                 var userDb = await this._repoGym.GetUserById(userCreated.Id);
-                var memberToCreate = new Member() { User = userDb };
+                var memberToCreate = new Member() { User = userDb};
                 var memberCreated = await this._repoGym.Register(memberToCreate, "");
+
 
                 return StatusCode(201);
             }

@@ -12,6 +12,7 @@ namespace prometheus.dto.gym.Members
         public string PhotoUrl { get; set; }
         public bool IsBlock { get; set; }
         public string BlockingReason { get; set; }
+        public int UserId { get; set; }
 
     }
 }
