@@ -3,6 +3,7 @@ import { GymService } from 'src/app/api/gym.service';
 import { IonSlides } from '@ionic/angular';
 import { SecurityService } from 'src/app/api/security.service';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-frontdesk',
@@ -10,6 +11,9 @@ import { Router } from '@angular/router';
   styleUrls: ['./frontdesk.page.scss'],
 })
 export class FrontdeskPage implements OnInit {
+
+  basePhotosUrl = environment.profilesPhotosRepoUrl + environment.profilesPhotosProjectName + '/' + environment.profilesPhotosFolderName + '/';
+
 
   currentView = 'block';
   data: any;

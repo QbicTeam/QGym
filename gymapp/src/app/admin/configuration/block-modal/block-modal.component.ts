@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { GymService } from 'src/app/api/gym.service';
 import { SharedService } from 'src/app/api/shared.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-block-modal',
@@ -18,6 +19,9 @@ export class BlockModalComponent implements OnInit {
 
   reason = '';
   isBlocked = false;
+  // tslint:disable-next-line:max-line-length
+  sourcePhotosPath = environment.profilesPhotosRepoUrl + environment.profilesPhotosProjectName + '/' + environment.profilesPhotosFolderName + '/';
+
 
   constructor(private modalCtrl: ModalController, private gymService: GymService, private sharedService: SharedService) { }
 

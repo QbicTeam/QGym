@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { GymService } from 'src/app/api/gym.service';
 import { ModalController } from '@ionic/angular';
 import { PackagesModalComponent } from '../packages-modal/packages-modal.component';
+import { SharedService } from 'src/app/api/shared.service';
 
 @Component({
   selector: 'app-gympackages',
@@ -10,22 +11,44 @@ import { PackagesModalComponent } from '../packages-modal/packages-modal.compone
 })
 export class GympackagesComponent implements OnInit {
 
-  data: any[];
+  data: any;
 
-  constructor(private gymService: GymService, private modalCtrl: ModalController) { }
+  constructor(private gymService: GymService, private modalCtrl: ModalController, private sharedService: SharedService) { }
 
   ngOnInit() {
-    this.data = this.gymService.getPackagesList();
+
+    this.loadPackagesList();
+
+    this.sharedService.onUpdateData.subscribe(value => {
+      if (value === 'packages') {
+        this.loadPackagesList();
+      }
+    });
+  }
+
+  loadPackagesList() {
+
+    this.gymService.getPackagesList().subscribe(response => {
+      this.data = response;
+      console.log(this.data);
+    });
+
   }
 
   async onAddNewPackage() {
 
+    this.openModal({id: 0});
+
+  }
+
+
+  async openModal(pkg) {
     const modal = await this.modalCtrl.create({
-      component: PackagesModalComponent
+      component: PackagesModalComponent,
+      componentProps: { pkgId: pkg.id }
     });
 
     await modal.present();
-
   }
 
 }

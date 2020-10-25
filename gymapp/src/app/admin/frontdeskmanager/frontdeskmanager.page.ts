@@ -26,8 +26,8 @@ export class FrontdeskmanagerPage implements OnInit {
   ngOnInit() {
     this.dailyRangeSchedule = this.gymService.getRangeForDailySchedule();
 
-    this.data = this.gymService.getMembersDetailsList();
-    this.dataSearched = this.data;
+    // this.data = this.gymService.getMembersDetailsList();
+    // this.dataSearched = this.data;
 
   }
 

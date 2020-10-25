@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GymService } from 'src/app/api/gym.service';
+// import { File } from '@ionic-native/file';
 
 @Component({
   selector: 'app-sales-report',
@@ -8,12 +9,38 @@ import { GymService } from 'src/app/api/gym.service';
 })
 export class SalesReportPage implements OnInit {
 
+  downloadUrl: any;
+  startDate = new Date();
+  endDate = new Date();
+  downloadLink: any;
+
   data: any;
 
   constructor(private gymService: GymService) { }
 
   ngOnInit() {
-    this.data = this.gymService.getSalesReport(null, null);
   }
 
+  ionViewDidEnter() {
+
+    this.downloadLink = document.getElementById('downlodSalesReportFile') as HTMLElement;
+
+    console.log(this.downloadLink);
+
+    this.gymService.getSalesReport(this.startDate, this.endDate).subscribe(response => {
+      console.log(response);
+      this.data = response;
+    });
+
+  }
+
+  onGenerateReport() {
+
+    this.gymService.getSalesReportForDownload(this.startDate, this.endDate).subscribe(response => {
+      console.log('link settted...');
+      this.downloadUrl = response.url;
+      this.downloadLink.click();
+    });
+
+  }
 }

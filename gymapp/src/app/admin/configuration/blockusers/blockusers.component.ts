@@ -3,6 +3,7 @@ import { GymService } from 'src/app/api/gym.service';
 import { ModalController } from '@ionic/angular';
 import { BlockModalComponent } from '../block-modal/block-modal.component';
 import { SharedService } from 'src/app/api/shared.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-blockusers',
@@ -13,6 +14,8 @@ export class BlockusersComponent implements OnInit {
 
   @Input() data: any;
   @Input() dataSearched: any;
+
+  basePhotosUrl = environment.profilesPhotosRepoUrl + environment.profilesPhotosProjectName + '/' + environment.profilesPhotosFolderName + '/';
 
   constructor(private gymService: GymService, private modalCtrl: ModalController, private sharedService: SharedService) { }
 

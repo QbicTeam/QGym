@@ -1,7 +1,8 @@
 <ion-header no-border>
-  <div class="login-header ion-padding">
+    <ion-item class="login-header" transparent lines="none">
+    <ion-back-button color="gym-primary" slot="start"></ion-back-button>
     <img src="../../assets/images/logo.png" alt="" class="logo-img">
-  </div>
+  </ion-item>
 </ion-header>
 
 
@@ -14,7 +15,7 @@
   <ion-grid>
     <ion-row>
       <ion-col>
-        <ion-button [routerLink]="['/', 'payment']" expand="block" color="gym-primary">Comprar membresia</ion-button>
+        <ion-button [routerLink]="['/', 'payment', currentPkg.id, currentPkg.name, currentPkg.price]" expand="block" color="gym-primary">Comprar membresia</ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>

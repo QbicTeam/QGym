@@ -1,11 +1,42 @@
 <ion-header no-border>
-  <div class="login-header ion-padding">
+    <ion-item class="login-header" transparent lines="none">
+    <ion-menu-button color="gym-primary" autoHide="false" menu="packagesmenu" slot="start"></ion-menu-button>
     <img src="../../assets/images/logo.png" alt="" class="logo-img">
-  </div>
+  </ion-item>
 </ion-header>
 
 
-<ion-content>
+<ion-menu side="start" *ngIf="currentUser" menuId="packagesmenu" contentId="packagesContent">
+  <ion-content>
+    <div class="menu-header-bg"></div>
+    <div class="header-content">
+      <img src="{{basePhotosUrl + currentUser.photoUrl}}" alt="">
+      <ion-label>
+        <h2>{{currentUser.displayName}}</h2>
+        <h3>{{currentUser.email}}</h3>
+        <p>Socio: {{currentUser.id}}</p>
+        <p><ion-badge color="light">{{currentUser.expiration | date:'dd MMM, yyyy'}}</ion-badge></p>
+      </ion-label>
+    </div>
+    <div class="action-button">
+      <ion-button (click)="onMyProfile()">
+        <ion-icon name="create-outline"></ion-icon>
+        Editar</ion-button>
+    </div>
+
+    <ion-list class="menu-items" lines="none">
+      <ion-item *ngFor="let mnu of currentMenu" button transparent (click)="onSelectedOption(mnu.option)">
+        <ion-icon slot="start" color="gym-primary" name="{{mnu.icon}}"></ion-icon>
+        <ion-label color="gym-primary">{{mnu.displayName}}</ion-label>
+      </ion-item>
+    </ion-list>
+
+  </ion-content>
+</ion-menu>
+
+
+
+<ion-content id="packagesContent">
 
   <ion-grid>
     <ion-row>
@@ -28,10 +59,10 @@
               </ion-row>
               <ion-row>
                 <ion-col>
-                  <ion-button [routerLink]="['/', 'payment']" expand="block" color="gym-primary">Comprar</ion-button>
+                  <ion-button [routerLink]="['/', 'payment', itm.id, itm.name, itm.price]" expand="block" color="gym-primary">Comprar</ion-button>
                 </ion-col>
                 <ion-col>
-                  <ion-button [routerLink]="['/', 'package-detail']" expand="block" color="medium">Ver Detalles</ion-button>
+                  <ion-button [routerLink]="['/', 'package-detail', itm.id, itm.name, itm.price]" expand="block" color="medium">Ver Detalles</ion-button>
                 </ion-col>
               </ion-row>
             </ion-grid>

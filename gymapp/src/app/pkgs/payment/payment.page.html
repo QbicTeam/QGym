@@ -1,7 +1,8 @@
 <ion-header no-border>
-  <div class="login-header ion-padding">
-    <img src="../../assets/images/logo.png" alt="" class="logo-img">
-  </div>
+  <ion-item class="login-header" transparent lines="none">
+    <ion-back-button color="gym-primary" slot="start"></ion-back-button>
+  <img src="../../assets/images/logo.png" alt="" class="logo-img">
+  </ion-item>
 </ion-header>
 
 <ion-content>
@@ -11,10 +12,10 @@
 
         <ion-card>
           <ion-item>
-            <ion-label>Acceso Total</ion-label>
-            <ion-label>Plan Mensual</ion-label>
+            <ion-label>{{currentPkg.id}}</ion-label>
+            <ion-label>{{currentPkg.name}}</ion-label>
             <ion-label slot="end">
-              <h1>$ 500.00</h1>
+              <h1>{{currentPkg.price | currency}}</h1>
             </ion-label>
           </ion-item>
         </ion-card>
