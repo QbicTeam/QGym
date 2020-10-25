@@ -203,7 +203,8 @@ namespace QGym.API.Controllers
                     role = userFromRepo.Role.DisplayName,
                     membershipExpiration = memberDb.MembershipExpiration,
                     photoUrl = memberDb.PhotoUrl,
-                    packageId = memberDb.MembershipTypeActiveId == null ? 0 : memberDb.MembershipTypeActiveId
+                    packageId = memberDb.MembershipTypeActiveId == null ? 0 : memberDb.MembershipTypeActiveId,
+                    memberId = memberDb.MemberId
                 });
                 // return Ok(token);
             } catch(Exception ex)

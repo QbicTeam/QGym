@@ -10,5 +10,8 @@ namespace prometheus.dto.gym.Members
         // Disponibilidad Restante.
         public string Capacity { get; set; }
         public bool Booked { get; set; }
+
+        public int capPercentaje { get; set; }
+        public int capPeople { get; set; }
     }
 }

@@ -6,7 +6,7 @@ namespace prometheus.dto.gym.Members
 {
     public class ReserveTimeDTO
     {
-        public DateTime Date { get; set; }
+        public string Date { get; set; } // DateTime
         public string Hour { get; set; }
     }
 }

@@ -90,7 +90,7 @@ namespace QGym.API.Controllers
 
                 var package = await _repo.GetMembershipById(id);
                 var result = new MembershipTypeFullDTO() { LongDescription = package.LongDescription };
-                //var result = _mapper.Map<MembershipTypeFullDTO>(package);
+                // var result = _mapper.Map<MembershipTypeFullDTO>(package);
 
                 return Ok(result);
             }
