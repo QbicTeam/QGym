@@ -13,6 +13,7 @@ namespace prometheus.model.gym
         public string Card { get; set; }
         public MembershipType Package { get; set; }
         public int PackageId { get; set; }
+        public string PackageJson { get; set; }
         public int DaysValidity { get; set; }
         public double Amount { get; set; }
         public string ResultTrans { get; set; }

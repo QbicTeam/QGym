@@ -186,7 +186,7 @@ namespace QGym.API.Controllers
                 if (member.MembershipExpiration > memberDb.MembershipExpiration)
                     memberDb.MembershipExpiration = member.MembershipExpiration;
 
-                if (memberDb.MembershipTypeActiveId == null && memberDb.MembershipTypeActiveId > 0)
+                if (memberDb.MembershipTypeActiveId == null && member.MembershipTypeActiveId > 0)
                 {
                     var membership = await this._repo.GetMembershipById(member.MembershipTypeActiveId.Value);
                     memberDb.MembershipTypeActive = membership;
