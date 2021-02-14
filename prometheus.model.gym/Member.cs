@@ -17,6 +17,8 @@ namespace prometheus.model.gym
         public MembershipType MembershipTypeActive { get; set; }
         public string BlockingReason { get; set; }
         public bool IsVerified { get; set; }
-
+        public DateTime Birthdate { get; set; }
+        public string Phone { get; set; }
+        public string PhoneReference { get; set; }
     }
 }

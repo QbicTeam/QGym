@@ -213,12 +213,18 @@ namespace QGym.API.Controllers
                     memberDb.BlockingReason = member.BlockingReason;
 
 
+                memberDb.Birthdate = member.Birthdate;
+                if(!string.IsNullOrEmpty(member.Phone))
+                    memberDb.Phone = member.Phone;
+                if (!string.IsNullOrEmpty(member.PhoneReference))
+                    member.PhoneReference = member.PhoneReference;
+
                 memberDb.User.LastModificationDate = DateTime.Today;
 
 
 
 
-                    await this._repo.SaveAll();
+                await this._repo.SaveAll();
 
                 return Ok();
 

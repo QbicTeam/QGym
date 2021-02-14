@@ -151,6 +151,8 @@ namespace QGym.API.Controllers
                 if(packageDb.IsActive && (string.IsNullOrEmpty(packageRq.LongDescription) || string.IsNullOrEmpty(packageRq.ShortDescription)))
                     return BadRequest("Valor Invalido, Descripciones HTML (requeridas cuando se activa)");
 
+                packageDb.ForSale = packageRq.ForSale;
+
                 await this._repo.SaveAll();
 
                 return Ok();

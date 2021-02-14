@@ -12,5 +12,6 @@ namespace prometheus.dto.gym.Membership
         public int PeriodicityDays { get; set; }
         public decimal Price { get; set; }
         public bool IsActive { get; set; }
+        public bool ForSale { get; set; }
     }
 }

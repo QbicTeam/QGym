@@ -13,6 +13,6 @@ namespace prometheus.dto.gym.Membership
         public string ShortDescription { get; set; }
         public string LongDescription { get; set; }
         public bool IsActive { get; set; }
-
+        public bool ForSale { get; set; }
     }
 }
