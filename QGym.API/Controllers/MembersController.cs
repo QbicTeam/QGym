@@ -208,6 +208,8 @@ namespace QGym.API.Controllers
                 }
 
                 memberDb.User.IsActive = !member.IsBlock;
+                memberDb.ChargeRegistration = member.ChargeRegistration;
+                memberDb.ChargeReregistration = member.ChargeReregistration;
 
                 if (!string.IsNullOrEmpty(member.BlockingReason))
                     memberDb.BlockingReason = member.BlockingReason;

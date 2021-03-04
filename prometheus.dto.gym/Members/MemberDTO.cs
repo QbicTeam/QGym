@@ -29,5 +29,7 @@ namespace prometheus.dto.gym.Members
         public DateTime Birthdate { get; set; }
         public string Phone { get; set; }
         public string CellPhone { get; set; }
+        public bool ChargeRegistration { get; set; }
+        public bool ChargeReregistration { get; set; }
     }
 }
