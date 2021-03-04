@@ -19,6 +19,6 @@ namespace prometheus.model.gym
         public bool IsVerified { get; set; }
         public DateTime Birthdate { get; set; }
         public string Phone { get; set; }
-        public string PhoneReference { get; set; }
+        public string CellPhone { get; set; }
     }
 }

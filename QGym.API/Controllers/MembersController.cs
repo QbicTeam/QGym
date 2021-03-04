@@ -216,8 +216,8 @@ namespace QGym.API.Controllers
                 memberDb.Birthdate = member.Birthdate;
                 if(!string.IsNullOrEmpty(member.Phone))
                     memberDb.Phone = member.Phone;
-                if (!string.IsNullOrEmpty(member.PhoneReference))
-                    member.PhoneReference = member.PhoneReference;
+                if (!string.IsNullOrEmpty(member.CellPhone))
+                    member.CellPhone = member.CellPhone;
 
                 memberDb.User.LastModificationDate = DateTime.Today;
 
