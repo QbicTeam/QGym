@@ -130,7 +130,8 @@ namespace QGym.API.Helpers
                     opt.MapFrom(src => src.PeriodicityDays.ToString() + " Días");
                 });
 
-
+            CreateMap<GeneralSettings, GeneralSettingsDTO>();
+            CreateMap<GeneralSettingsDTO, GeneralSettings>();
         }
 
     }

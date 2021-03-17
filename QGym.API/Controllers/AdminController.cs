@@ -92,6 +92,29 @@ namespace QGym.API.Controllers
             }
 
         }
+        [HttpGet("settings/general")]
+        public async Task<ActionResult> GetGeneralSetting()
+        {
+            try
+            {
+
+                //var result = new AuthorizedCapacityReportDTO();
+
+                var gs = await _repo.GetGeneralSettings();
+
+                if (gs == null) return BadRequest("Contacte al Administrador, sin configuración.");
+
+                var result = this._mapper.Map<GeneralSettingsDTO>(gs);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "N/A", ex);
+                return BadRequest(this._appSettings.Value.ServerError);
+            }
+
+        }
         [HttpGet("schedule/weekdays")]
         public async Task<ActionResult> GetWeekdays()
         {
@@ -440,6 +463,31 @@ namespace QGym.API.Controllers
             {
                 new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, reserveData, ex);
                 return BadRequest(this._appSettings.Value.ServerError); //this._config.GetSection("AppSettings:ServerError").Value);
+            }
+
+        }
+        [HttpPut("settings/general")]
+        public async Task<ActionResult> UpdateGeneralSetting([FromBody] GeneralSettingsDTO generalSettings)
+        {
+            try
+            {
+                if (generalSettings.ScheduleChangeHours < 0)
+                    return BadRequest("Valor Invalido, las horas no deben ser negativas");
+
+                var gsDb = await _repo.GetGeneralSettings();
+
+                gsDb.RegistrationCost = generalSettings.RegistrationCost;
+                gsDb.ReregistrationCost = generalSettings.ReregistrationCost;
+                gsDb.ScheduleChangeHours = generalSettings.ScheduleChangeHours;
+
+                await this._repo.SaveAll();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "N/A", ex);
+                return BadRequest(this._appSettings.Value.ServerError);
             }
 
         }

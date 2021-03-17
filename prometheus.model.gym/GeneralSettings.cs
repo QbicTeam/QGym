@@ -9,8 +9,8 @@ namespace prometheus.model.gym
         public string ScheduledWeek { get; set; }
         public string CovidMsg { get; set; }
         public int NotificationCapacity { get; set; }
-        public bool RegistrationCost { get; set; }
-        public bool ReregistrationCost { get; set; }
+        public int RegistrationCost { get; set; }
+        public int ReregistrationCost { get; set; }
 
     }
 }
