@@ -10,8 +10,8 @@ using prometheus.data.gym;
 namespace prometheus.data.gym.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20201011225105_InicialDB")]
-    partial class InicialDB
+    [Migration("20210318014717_Inicial_Con_CamposDeValidacion")]
+    partial class Inicial_Con_CamposDeValidacion
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -61,6 +61,12 @@ namespace prometheus.data.gym.Migrations
                     b.Property<int>("NotificationCapacity")
                         .HasColumnType("int");
 
+                    b.Property<int>("RegistrationCost")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReregistrationCost")
+                        .HasColumnType("int");
+
                     b.Property<int>("ScheduleChangeHours")
                         .HasColumnType("int");
 
@@ -82,8 +88,20 @@ namespace prometheus.data.gym.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("Birthdate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("BlockingReason")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CellPhone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("ChargeRegistration")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ChargeReregistration")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
@@ -96,6 +114,9 @@ namespace prometheus.data.gym.Migrations
 
                     b.Property<int?>("MembershipTypeActiveId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("nvarchar(max)");
@@ -121,6 +142,9 @@ namespace prometheus.data.gym.Migrations
 
                     b.Property<string>("Code")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("ForSale")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");

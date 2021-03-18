@@ -41,9 +41,9 @@ namespace QGym.API
             //    services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
             //        .ConfigureWarnings(w => w.Ignore(CoreEventId.IncludeIgnoredWarning)));
 
-            //services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("LocalConnectionSQLServer")));
+            // services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("LocalConnectionSQLServer")));
             // // .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning)));
-            //services.AddDbContext<SecuritasDbContext>(x => x.UseSqlServer(Configuration.GetConnectionString("LocalConnectionSQLServer")));
+            // services.AddDbContext<SecuritasDbContext>(x => x.UseSqlServer(Configuration.GetConnectionString("LocalConnectionSQLServer")));
             services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionRemoteSQLServer")));
             services.AddDbContext<SecuritasDbContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionRemoteSQLServer")));
 

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace prometheus.data.gym.Migrations
 {
-    public partial class InicialDB : Migration
+    public partial class Inicial_Con_CamposDeValidacion : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -37,7 +37,9 @@ namespace prometheus.data.gym.Migrations
                     LoginAttempts = table.Column<int>(nullable: false),
                     ScheduledWeek = table.Column<string>(nullable: true),
                     CovidMsg = table.Column<string>(nullable: true),
-                    NotificationCapacity = table.Column<int>(nullable: false)
+                    NotificationCapacity = table.Column<int>(nullable: false),
+                    RegistrationCost = table.Column<int>(nullable: false),
+                    ReregistrationCost = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -56,7 +58,8 @@ namespace prometheus.data.gym.Migrations
                     Price = table.Column<decimal>(nullable: false),
                     ShortDescription = table.Column<string>(nullable: true),
                     LongDescription = table.Column<string>(nullable: true),
-                    IsActive = table.Column<bool>(nullable: false)
+                    IsActive = table.Column<bool>(nullable: false),
+                    ForSale = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -130,7 +133,12 @@ namespace prometheus.data.gym.Migrations
                     MembershipExpiration = table.Column<DateTime>(nullable: false),
                     MembershipTypeActiveId = table.Column<int>(nullable: true),
                     BlockingReason = table.Column<string>(nullable: true),
-                    IsVerified = table.Column<bool>(nullable: false)
+                    IsVerified = table.Column<bool>(nullable: false),
+                    Birthdate = table.Column<DateTime>(nullable: false),
+                    Phone = table.Column<string>(nullable: true),
+                    CellPhone = table.Column<string>(nullable: true),
+                    ChargeRegistration = table.Column<bool>(nullable: false),
+                    ChargeReregistration = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {

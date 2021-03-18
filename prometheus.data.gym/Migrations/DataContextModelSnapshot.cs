@@ -59,6 +59,12 @@ namespace prometheus.data.gym.Migrations
                     b.Property<int>("NotificationCapacity")
                         .HasColumnType("int");
 
+                    b.Property<int>("RegistrationCost")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReregistrationCost")
+                        .HasColumnType("int");
+
                     b.Property<int>("ScheduleChangeHours")
                         .HasColumnType("int");
 
@@ -80,8 +86,20 @@ namespace prometheus.data.gym.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("Birthdate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("BlockingReason")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CellPhone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("ChargeRegistration")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ChargeReregistration")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
@@ -94,6 +112,9 @@ namespace prometheus.data.gym.Migrations
 
                     b.Property<int?>("MembershipTypeActiveId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("nvarchar(max)");
@@ -119,6 +140,9 @@ namespace prometheus.data.gym.Migrations
 
                     b.Property<string>("Code")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("ForSale")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
