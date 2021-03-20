@@ -237,6 +237,59 @@ namespace QGym.API.Controllers
                 return BadRequest(this._appSettings.Value.ServerError);
             }
         }
+
+        [HttpPut("{userId}/{memberId}")]
+        public async Task<IActionResult> UpdateMemberId(int userId, string memberId)
+        {
+            try
+            {
+                var userDb = await this._repo.GetMember(null, null, userId); // memberId, 0); 
+                var memberIdDb = await this._repo.GetMember(null, memberId, 0);
+
+                if (memberIdDb != null)
+                {
+                    var result = _mapper.Map<MemberDTO>(memberId);
+                    return Ok(result);                    
+                }
+
+                userDb.MemberId = memberId;
+
+                await this._repo.SaveAll();
+
+                return Ok();
+
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "N/A", ex, "userId: " + userId.ToString() + ", memberId: " + memberId);
+                return BadRequest(this._appSettings.Value.ServerError);
+            }
+        }
+        [HttpPut("{userId}/{memberId}/force")]
+        public async Task<IActionResult> UpdateMemberIdForce(int userId, string memberId)
+        {
+            try
+            {
+                var userDb = await this._repo.GetMember(null, null, userId); // memberId, 0); 
+                var memberIdDb = await this._repo.GetMember(null, memberId, 0);
+
+                if (memberIdDb != null)
+                    this._repo.Remove(memberIdDb);
+
+
+                userDb.MemberId = memberId;
+                
+                await this._repo.SaveAll();
+
+                return Ok();
+
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, "N/A", ex, "userId: " + userId.ToString() + ", memberId: " + memberId);
+                return BadRequest(this._appSettings.Value.ServerError);
+            }
+        }
         [HttpGet("{userId}/schedule/summary")]
         public async Task<ActionResult> ScheduleSummary(int userId)
         {
