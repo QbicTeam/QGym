@@ -12,6 +12,8 @@
     <ProjectReference Include="..\prometheus.model.gym\prometheus.model.gym.csproj" />
     <ProjectReference Include="..\prometheus.dto.gym\prometheus.dto.gym.csproj" />
     <ProjectReference Include="..\prometheus.data.gym\prometheus.data.gym.csproj" />
+    <PackageReference Include="ExcelDataReader" Version="3.6.0" />
+    <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
 
   <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.5" />   
    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.5" />
@@ -29,5 +31,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+
+   <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
   </ItemGroup>
 </Project>
