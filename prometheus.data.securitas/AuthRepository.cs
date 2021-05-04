@@ -239,7 +239,7 @@ namespace prometheus.data.securitas
                 + fr4.ToString();
 
             // Todo: Remover cuando se pueda mandar el correo.
-            result = DateTime.Today.ToString("MMdd");
+            // result = DateTime.Today.ToString("MMdd");
 
             return result;
         }

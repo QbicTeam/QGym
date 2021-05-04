@@ -9,20 +9,12 @@ using Microsoft.IdentityModel.Tokens;
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Collections.Specialized;
-using System.Net.Http.Headers;
-// using System.Net.Http.Formatting;
-
-// using Newtonsoft.Json;
 
 using prometheus.data.securitas;
 using prometheus.model.securitas;
 using prometheus.dto.securitas;
 using prometheus.data.gym;
 using prometheus.model.gym;
-using prometheus.dto.gym.PrometheusMgr;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 using QGym.API.Helpers;
@@ -30,7 +22,6 @@ using System.Reflection;
 using System.Diagnostics;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Options;
-using System.IO;
 
 // using SIQbic.API.Model.Enums;
 
@@ -65,64 +56,8 @@ namespace QGym.API.Controllers
 
                 var codeConfirm = this._repo.GenerateConfirmationCode();
 
-                // TODO: Envio de Correo.
-                //using (var wb = new WebClient())
-                //{
-                //    var data = new NameValueCollection( );
-                //    data["to"] = "carlossotoocio@gmail.com";
-                //    data["body"] = "";
-                //    data["subject"] = "Codigo de Confirmacion1";
-                //    data["isHtml"] = "true";
-                //    data["templateId"] = "4";
-                //    data["values"] = "[{ 'Variable':'Socio', 'Value':'Majahide P.' }, { 'Variable':'Codigo', 'Value':'123yTres4' }]";
-
-                //    var response = await wb.UploadValuesAsync(Uri("http://prometheusapis.net/emailapi/emails"), "POST", data);
-
-                //}
-                var emailUrl = "http://prometheusapis.net/emailapi/emails";
-                /*
-                using (var client = new HttpClient())
-                {
-                    person p = new person { name = "Sourav", surname = "Kayal" };
-                    client.BaseAddress = new Uri("http://localhost:1565/");
-                    var response = client.PostAsJsonAsync("api/person", p).Result;
-                    if (response.IsSuccessStatusCode)
-                    {
-                        Console.Write("Success");
-                    }
-                    else
-                        Console.Write("Error");
-                }
-                */
-                /*
-                WebRequest oRequest = WebRequest.Create(emailUrl);
-                oRequest.Method = "post";
-                oRequest.ContentType = "application/json;charset-UTF-8";
-                using(var oSW = new StreamWriter(oRequest.GetRequestStream()))
-                {
-                    var values = new List<Variables>();
-                    values.Add(new Variables() { Variable = "Socio", Value = "Carlos F."});
-                    values.Add(new Variables() { Variable = "Codigo", Value = "12yTres4" });
-                    var emailCode = new SendEmail() { 
-                         To = "carlossotoocio@gmail.com",
-                         Body = "",
-                         Subject = "Codigo de Confirmacion",
-                         IsHtml = true,
-                         TemplateId = 4,
-                         Values = values
-                    };
-                    string json = JsonConvert.SerializeObject(emailCode);
-                    oSW.Write(json);
-                    oSW.Flush();
-                    oSW.Close();
-                }
-                WebResponse oResponse = oRequest.GetResponse();
-                using (var oSR = new StreamReader(oResponse.GetResponseStream()))
-                {
-                    oSR.ReadToEnd();
-                }
-                */
-                new PrometheusServicesHelper(this._appSettings).SendEmail(memberDb.User.UserName, memberDb.User.DisplayName, codeConfirm);
+                // Envio de Correo.
+                 new PrometheusServicesHelper(this._appSettings).SendEmail(memberDb.User.UserName, memberDb.User.DisplayName, codeConfirm);
 
                 return Ok(codeConfirm);
             }
@@ -357,19 +292,8 @@ namespace QGym.API.Controllers
                 if (memberDb == null)
                     return BadRequest("Usuario no encontrado");
 
-                // TODO: Esto esta provicional, Falta determinar los campos de validacion.
-                switch (confirmation.Key)
-                {
-                    case "Edad":
-                        if (confirmation.MemberId == confirmation.Value) valid = true;
-                        break;
-                    case "Fin Vigencia":
-                        if (confirmation.MemberId == confirmation.Value) valid = true;
-                        break;
-                    case "Telefono":
-                        if (confirmation.MemberId == confirmation.Value) valid = true;
-                        break;
-                }
+                // Validation Confirmation Data
+                valid = ValidateConfirmationData(confirmation, memberDb, valid);
 
                 if (!valid)
                     return BadRequest("Verificacion Invalida");
@@ -377,8 +301,8 @@ namespace QGym.API.Controllers
 
                 var codeConfirm = this._repo.GenerateConfirmationCode();
 
-                // TODO: Envio de Correo.
-
+                // Envio de Correo.
+                new PrometheusServicesHelper(this._appSettings).SendEmail(memberDb.User.UserName, memberDb.User.DisplayName, codeConfirm);
 
                 return Ok(codeConfirm);
             }
@@ -424,35 +348,17 @@ namespace QGym.API.Controllers
                 if (memberEmailDb != null)
                     return BadRequest("El correo ya se encuentra Registrado");
 
-                //// TODO: Esto esta provicional, Falta determinar los campos de validacion.
-                //if (confirmationDto.Key == "Edad")
-                //{
-                //    if (confirmationDto.MemberId != confirmationDto.Value)
-                //    {
-                //        return BadRequest("Verificacion Invalida");
-                //    }
-                //}
+
                 var valid = false;
-                // TODO: Esto esta provicional, Falta determinar los campos de validacion.
-                switch (confirmationDto.Key)
-                {
-                    case "Edad":
-                        if (confirmationDto.MemberId == confirmationDto.Value) valid = true;
-                        break;
-                    case "Fin Vigencia":
-                        if (confirmationDto.MemberId == confirmationDto.Value) valid = true;
-                        break;
-                    case "Telefono":
-                        if (confirmationDto.MemberId == confirmationDto.Value) valid = true;
-                        break;
-                }
+                // Validation Confirmation Data
+                valid = ValidateConfirmationData(confirmationDto, memberDb, valid);
 
                 if (!valid)
                     return BadRequest("Verificacion Invalida");
 
                 var codeConfirm = this._repo.GenerateConfirmationCode();
 
-                // TODO: Envio de Correo.
+                // Envio de Correo.
                 new PrometheusServicesHelper(this._appSettings).SendEmail(memberDb.User.UserName, memberDb.User.DisplayName, codeConfirm);
 
                 return Ok(codeConfirm);
@@ -464,6 +370,23 @@ namespace QGym.API.Controllers
             }
         }
 
+        private static bool ValidateConfirmationData(UserForConfirmationCodeDTO confirmationDto, Member memberDb, bool valid)
+        {
+            switch (confirmationDto.Key)
+            {
+                case "Birthdate":
+                    if (memberDb.Birthdate.ToString("dd/MM/yyyy") == confirmationDto.Value) valid = true;
+                    break;
+                case "Phone":
+                    if (memberDb.Phone == confirmationDto.Value) valid = true;
+                    break;
+                case "CellPhone":
+                    if (memberDb.CellPhone == confirmationDto.Value) valid = true;
+                    break;
+            }
+
+            return valid;
+        }
 
         public string CurrentPwd { get; set; }
 
@@ -547,7 +470,7 @@ namespace QGym.API.Controllers
                 {
                     result.Email = memberDb.User.UserName;
                     result.ConfirmationCode = this._repo.GenerateConfirmationCode(); // Convert.ToInt32(this._repo.GenerateConfirmationCode());
-                    // TODO: Mandar correo de confirmacion
+                    // Mandar correo de confirmacion
                     new PrometheusServicesHelper(this._appSettings).SendEmail(memberDb.User.UserName, memberDb.User.DisplayName, result.ConfirmationCode);
                 }
                 
@@ -562,177 +485,7 @@ namespace QGym.API.Controllers
 
         }
 
-        // [HttpGet("onboard/{rcode}")]
-        // public async Task<ActionResult> StartRegistrationProcess(string rcode)
-        // {
-        //     string CODE_NOT_VALID_MESSAGE = "502 - Codigo de registro no valido.";
-        //     string CODE_CANCELLED_MESSAGE = "503 - El codigo fue cancelado.";
-        //     string CODE_DUE_DATE_MESSAGE ="504 - El codigo ya expiro.";
-        //     string CODE_ALREADY_ACTIVADED_MESSAGE= "505 - Este codigo ya fue utilizado.";
-        //     string CODE_IN_WAITING_APPROVAL = "506 - Invitacion en proceso de aprobacion";
-
-        //     UserToStartRegister result = new UserToStartRegister();
-
-        //     var data = await this._repo.GetInvitations();
-        //     var regCode = data.ToList().FirstOrDefault(rc => rc.Code == rcode);
-
-        //     if (regCode == null)
-        //     {
-        //         return BadRequest(CODE_NOT_VALID_MESSAGE);
-        //     }
-        //     else
-        //     {
-        //         RegistrationCodeStatusType userRegCodeStatus = (RegistrationCodeStatusType) Enum.Parse(typeof(RegistrationCodeStatusType), regCode.Status);
-
-        //         if (userRegCodeStatus ==  RegistrationCodeStatusType.Cancelled)
-        //         {
-        //             return StatusCode(500, CODE_CANCELLED_MESSAGE);
-        //         }
-        //         else if (userRegCodeStatus == RegistrationCodeStatusType.Activated)
-        //         {
-        //             return StatusCode(500, CODE_ALREADY_ACTIVADED_MESSAGE);
-        //         }
-        //         else if (userRegCodeStatus == RegistrationCodeStatusType.Requested)
-        //         {
-        //             return StatusCode(500, CODE_IN_WAITING_APPROVAL);
-        //         }
-        //         else if (regCode.DueDate < DateTime.Now)
-        //         {
-        //             return StatusCode(500, CODE_DUE_DATE_MESSAGE);
-        //         }
-        //         else
-        //         {
-        //             return Ok (new UserToStartRegister{
-        //                 Email = regCode.InvitedEmail
-        //              });
-        //         }
-        //     }
-
-        // }
-
-        // [HttpPost("invites/{rcode}")]
-        // public async Task<ActionResult> RequestInvite(string rcode)
-        // {
-        //     string CODE_NOT_VALID_MESSAGE = "502 - Codigo de registro no valido.";
-
-        //     UserToStartRegister result = new UserToStartRegister();
-
-        //     var data = await this._repo.GetInvitations();
-        //     var regCode = data.FirstOrDefault(rc => rc.Code == rcode);
-
-        //     if (regCode == null)
-        //     {
-        //         return BadRequest(CODE_NOT_VALID_MESSAGE);
-        //     }
-        //     else
-        //     {
-
-        //         RegistrationCodeStatusType userRegCodeStatus = (RegistrationCodeStatusType) Enum.Parse(typeof(RegistrationCodeStatusType), regCode.Status);
-
-        //         await this._repo.RequestInvitation(regCode.InvitedEmail, regCode.SponsorEmail, regCode.RoleId, regCode.InvitedName);
-
-        //         return Ok();
-        //     }
-
-        // }
-
-        // [HttpPut("invites/{id}")]
-        // public async Task<ActionResult> UpdateInvite(int id, InviteForUpdateDTO inviteForUpdate)
-        // {
-        //     var reg = await this._repo.GetInvitationById(id);
-
-        //     reg.RoleId = inviteForUpdate.RoleId;
-        //     reg.InvitedName = inviteForUpdate.InvitedName;
-        //     await this._repo.SaveAll();
-
-        //     return Ok();
-        // }
-
-        // [HttpDelete("invites/{id}")]
-        // public async Task<ActionResult> CancelInvite(int id)
-        // {
-        //     var reg = await this._repo.GetInvitationById(id);
-
-        //     reg.Status = RegistrationCodeStatusType.Cancelled.ToString();
-
-        //     await this._repo.SaveAll();
-
-        //     return Ok();
-        // }
-
-        // [HttpPut("invites/{id}/approve")]
-        // public async Task<ActionResult> ApproveInvite(int id)
-        // {
-        //     var reg = await this._repo.GetInvitationById(id);
-
-        //     reg.Status = RegistrationCodeStatusType.Accepted.ToString();
-
-        //     await this._repo.SaveAll();
-
-        //     return Ok();
-        // }
-
-        // [HttpPost("invites")]
-        // public async Task<ActionResult> CreateInvite(InviteForCreationDTO inviteForCreation)
-        // {
-
-        //     RegistrationCode regCode = new RegistrationCode {
-        //         DateCreated = DateTime.Now,
-        //         InvitedEmail = inviteForCreation.InvitedEmail,
-        //         InvitedName = inviteForCreation.InvitedName,
-        //         SponsorEmail = inviteForCreation.SponsorEmail,
-        //         RoleId = inviteForCreation.RoleId,
-        //         Status = RegistrationCodeStatusType.Created.ToString()
-        //     };
-
-        //     await this._repo.CreateInvitation(regCode);
-
-        //     var result = new RegistrationCodeForReport{
-        //             Id = regCode.Id,
-        //             DateCreated = regCode.DateCreated,
-        //             DueDate = regCode.DueDate,
-        //             InvitedEmail = regCode.InvitedEmail,
-        //             InvitedName = regCode.InvitedName,
-        //             SponsorEmail = regCode.SponsorEmail,
-        //             Status = regCode.Status,
-        //             Code = regCode.Code
-        //         };
-
-        //     if (inviteForCreation.RoleId == 0) result.Role = new Role { Id = inviteForCreation.RoleId, DisplayName="Usuario" };
-        //     if (inviteForCreation.RoleId == 1) result.Role = new Role { Id = inviteForCreation.RoleId, DisplayName="Operador" };
-        //     if (inviteForCreation.RoleId == 2) result.Role = new Role { Id = inviteForCreation.RoleId, DisplayName="Administrador" };
-
-        //     return Ok(result);
-
-        // }
-
-        // [HttpGet("invites")]
-        // public async Task<ActionResult> GetInvites() 
-        // {
-        //     var invitations = await this._repo.GetInvitations();
-
-        //     var result = new List<RegistrationCodeForReport>();
-        //     foreach(var i in invitations)
-        //     {
-        //         result.Add(new RegistrationCodeForReport{
-        //             Id = i.Id,
-        //             DateCreated = i.DateCreated,
-        //             DueDate = i.DueDate,
-        //             InvitedEmail = i.InvitedEmail,
-        //             InvitedName = i.InvitedName,
-        //             SponsorEmail = i.SponsorEmail,
-        //             Status = i.Status,
-        //             Code = i.Code
-        //         });
-
-        //         if (i.RoleId == 0) result[result.Count-1].Role = new Role { Id = 0, DisplayName = "Usuario"};
-        //         if (i.RoleId == 1) result[result.Count-1].Role = new Role { Id = 1, DisplayName = "Operador"};
-        //         if (i.RoleId == 2) result[result.Count-1].Role = new Role { Id = 2, DisplayName = "Administrador"};
-
-        //     }
-
-        //     return Ok(result);
-        // }
+        
         /*
         static void SendEmail()
         {
