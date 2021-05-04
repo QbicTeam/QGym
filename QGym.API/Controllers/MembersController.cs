@@ -219,7 +219,7 @@ namespace QGym.API.Controllers
                 if(!string.IsNullOrEmpty(member.Phone))
                     memberDb.Phone = member.Phone;
                 if (!string.IsNullOrEmpty(member.CellPhone))
-                    member.CellPhone = member.CellPhone;
+                    memberDb.CellPhone = member.CellPhone;
 
                 memberDb.User.LastModificationDate = DateTime.Today;
 
@@ -248,7 +248,7 @@ namespace QGym.API.Controllers
 
                 if (memberIdDb != null)
                 {
-                    var result = _mapper.Map<MemberDTO>(memberId);
+                    var result = _mapper.Map<MemberDTO>(memberIdDb);
                     return Ok(result);                    
                 }
 
@@ -274,7 +274,11 @@ namespace QGym.API.Controllers
                 var memberIdDb = await this._repo.GetMember(null, memberId, 0);
 
                 if (memberIdDb != null)
+                {
+                    this._repo.Remove(memberIdDb.User);
                     this._repo.Remove(memberIdDb);
+                }
+                    
 
 
                 userDb.MemberId = memberId;

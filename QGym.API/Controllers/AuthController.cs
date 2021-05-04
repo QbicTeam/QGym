@@ -9,12 +9,20 @@ using Microsoft.IdentityModel.Tokens;
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Collections.Specialized;
+using System.Net.Http.Headers;
+// using System.Net.Http.Formatting;
+
+// using Newtonsoft.Json;
 
 using prometheus.data.securitas;
 using prometheus.model.securitas;
 using prometheus.dto.securitas;
 using prometheus.data.gym;
 using prometheus.model.gym;
+using prometheus.dto.gym.PrometheusMgr;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 using QGym.API.Helpers;
@@ -22,6 +30,8 @@ using System.Reflection;
 using System.Diagnostics;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Options;
+using System.IO;
+
 // using SIQbic.API.Model.Enums;
 
 namespace QGym.API.Controllers 
@@ -56,7 +66,63 @@ namespace QGym.API.Controllers
                 var codeConfirm = this._repo.GenerateConfirmationCode();
 
                 // TODO: Envio de Correo.
+                //using (var wb = new WebClient())
+                //{
+                //    var data = new NameValueCollection( );
+                //    data["to"] = "carlossotoocio@gmail.com";
+                //    data["body"] = "";
+                //    data["subject"] = "Codigo de Confirmacion1";
+                //    data["isHtml"] = "true";
+                //    data["templateId"] = "4";
+                //    data["values"] = "[{ 'Variable':'Socio', 'Value':'Majahide P.' }, { 'Variable':'Codigo', 'Value':'123yTres4' }]";
 
+                //    var response = await wb.UploadValuesAsync(Uri("http://prometheusapis.net/emailapi/emails"), "POST", data);
+
+                //}
+                var emailUrl = "http://prometheusapis.net/emailapi/emails";
+                /*
+                using (var client = new HttpClient())
+                {
+                    person p = new person { name = "Sourav", surname = "Kayal" };
+                    client.BaseAddress = new Uri("http://localhost:1565/");
+                    var response = client.PostAsJsonAsync("api/person", p).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Console.Write("Success");
+                    }
+                    else
+                        Console.Write("Error");
+                }
+                */
+                /*
+                WebRequest oRequest = WebRequest.Create(emailUrl);
+                oRequest.Method = "post";
+                oRequest.ContentType = "application/json;charset-UTF-8";
+                using(var oSW = new StreamWriter(oRequest.GetRequestStream()))
+                {
+                    var values = new List<Variables>();
+                    values.Add(new Variables() { Variable = "Socio", Value = "Carlos F."});
+                    values.Add(new Variables() { Variable = "Codigo", Value = "12yTres4" });
+                    var emailCode = new SendEmail() { 
+                         To = "carlossotoocio@gmail.com",
+                         Body = "",
+                         Subject = "Codigo de Confirmacion",
+                         IsHtml = true,
+                         TemplateId = 4,
+                         Values = values
+                    };
+                    string json = JsonConvert.SerializeObject(emailCode);
+                    oSW.Write(json);
+                    oSW.Flush();
+                    oSW.Close();
+                }
+                WebResponse oResponse = oRequest.GetResponse();
+                using (var oSR = new StreamReader(oResponse.GetResponseStream()))
+                {
+                    oSR.ReadToEnd();
+                }
+                */
+                new PrometheusServicesHelper(this._appSettings).SendEmail(memberDb.User.UserName, memberDb.User.DisplayName, codeConfirm);
 
                 return Ok(codeConfirm);
             }
@@ -387,7 +453,7 @@ namespace QGym.API.Controllers
                 var codeConfirm = this._repo.GenerateConfirmationCode();
 
                 // TODO: Envio de Correo.
-
+                new PrometheusServicesHelper(this._appSettings).SendEmail(memberDb.User.UserName, memberDb.User.DisplayName, codeConfirm);
 
                 return Ok(codeConfirm);
             }
@@ -480,8 +546,9 @@ namespace QGym.API.Controllers
                 else
                 {
                     result.Email = memberDb.User.UserName;
-                    result.ConfirmationCode = Convert.ToInt32(this._repo.GenerateConfirmationCode());
+                    result.ConfirmationCode = this._repo.GenerateConfirmationCode(); // Convert.ToInt32(this._repo.GenerateConfirmationCode());
                     // TODO: Mandar correo de confirmacion
+                    new PrometheusServicesHelper(this._appSettings).SendEmail(memberDb.User.UserName, memberDb.User.DisplayName, result.ConfirmationCode);
                 }
                 
 
@@ -666,7 +733,41 @@ namespace QGym.API.Controllers
 
         //     return Ok(result);
         // }
+        /*
+        static void SendEmail()
+        {
+            var emailUrl = "http://prometheusapis.net/emailapi/emails";
 
-
+            WebRequest oRequest = WebRequest.Create(emailUrl);
+            oRequest.Method = "post";
+            oRequest.ContentType = "application/json;charset-UTF-8";
+            // oRequest.Headers["x-api-key"] = "03ffbf2f-f820-4655-90f2-ea7dc1689fba";
+            oRequest.Headers.Add("x-api-key","03ffbf2f-f820-4655-90f2-ea7dc1689fba");
+            using (var oSW = new StreamWriter(oRequest.GetRequestStream()))
+            {
+                var values = new List<Variables>();
+                values.Add(new Variables() { Variable = "Socio", Value = "Carlos F." });
+                values.Add(new Variables() { Variable = "Codigo", Value = "12yTres4" });
+                var emailCode = new SendEmailDto()
+                {
+                    To = "carlossotoocio@gmail.com",
+                    Body = "",
+                    Subject = "Codigo de Confirmacion",
+                    IsHtml = true,
+                    TemplateId = 4,
+                    Values = values
+                };
+                string json = JsonConvert.SerializeObject(emailCode);
+                oSW.Write(json);
+                oSW.Flush();
+                oSW.Close();
+            }
+            WebResponse oResponse = oRequest.GetResponse();
+            using (var oSR = new StreamReader(oResponse.GetResponseStream()))
+            {
+                oSR.ReadToEnd();
+            }
+        }
+        */
     }
 }
