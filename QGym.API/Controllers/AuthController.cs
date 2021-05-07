@@ -372,16 +372,18 @@ namespace QGym.API.Controllers
 
         private static bool ValidateConfirmationData(UserForConfirmationCodeDTO confirmationDto, Member memberDb, bool valid)
         {
+            var gHelper = new GeneralHelper();
+            valid = false;
             switch (confirmationDto.Key)
             {
                 case "Birthdate":
-                    if (memberDb.Birthdate.ToString("dd/MM/yyyy") == confirmationDto.Value) valid = true;
+                    if (gHelper.GetOnlyNumber(memberDb.Birthdate.ToString("dd/MM/yyyy")) == gHelper.GetOnlyNumber(confirmationDto.Value)) valid = true;
                     break;
                 case "Phone":
-                    if (memberDb.Phone == confirmationDto.Value) valid = true;
+                    if (gHelper.GetOnlyNumber(memberDb.Phone) == gHelper.GetOnlyNumber(confirmationDto.Value)) valid = true;
                     break;
                 case "CellPhone":
-                    if (memberDb.CellPhone == confirmationDto.Value) valid = true;
+                    if (gHelper.GetOnlyNumber(memberDb.CellPhone) == gHelper.GetOnlyNumber(confirmationDto.Value)) valid = true;
                     break;
             }
 
