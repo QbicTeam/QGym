@@ -5,11 +5,11 @@ import { SecurityService } from 'src/app/api/security.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-sales-report',
-  templateUrl: './sales-report.page.html',
-  styleUrls: ['./sales-report.page.scss'],
+  selector: 'app-membersactivation',
+  templateUrl: './membersactivation.page.html',
+  styleUrls: ['./membersactivation.page.scss'],
 })
-export class SalesReportPage implements OnInit {
+export class MembersactivationPage implements OnInit {
 
   basePhotosUrl = environment.profilesPhotosRepoUrl + environment.profilesPhotosProjectName + '/' + environment.profilesPhotosFolderName + '/';
   currentMenu: any;
@@ -31,30 +31,14 @@ export class SalesReportPage implements OnInit {
 
   }
 
-  ionViewDidEnter() {
-
-
-    this.gymService.getSalesReport(this.startDate, this.endDate).subscribe(response => {
-      console.log(response);
-      this.data = response;
-    });
-
-  }
-
-  onGenerateReport() {
-
-    this.downloadUrl = null;
-
-    this.gymService.getSalesReportForDownload(this.startDate, this.endDate).subscribe(response => {
-      this.downloadUrl = response.url;
-    });
-
-  }
-
   onMyProfile() {
 
   }
 
+  logOut() {
+    this.securityService.logOut();
+    this.router.navigateByUrl('/home');
+  }
 
   onSelectedOption(option) {
 
@@ -78,11 +62,6 @@ export class SalesReportPage implements OnInit {
     else if (option === 'activation') {
       this.router.navigate(['/membersactivation']);
     }
-  }
-
-  logOut() {
-    this.securityService.logOut();
-    this.router.navigateByUrl('/home');
   }
 
 }

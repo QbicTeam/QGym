@@ -1,31 +1,36 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Mostrador: Asignacion de asistencia</ion-title>
-  </ion-toolbar>
+<ion-header no-border>
+  <!-- <div class="login-header ion-padding"> -->
+    <ion-item class="login-header" transparent lines="none">
+      <ion-back-button color="gym-primary" slot="start"></ion-back-button>
+      <ion-label>Asignacion de Reservaciones</ion-label>
+    </ion-item>
+  <!-- </div> -->
 </ion-header>
 
-<ion-content>
 
+<ion-content>
   
 
   <ion-segment scrollable="true" [(ngModel)]="currentDay">
     <ion-segment-button (click)="goto(idx)" *ngFor="let itm of dailyRangeSchedule; let idx = index" value="{{idx}}">
-      <h2>{{itm.getDate()}}</h2>
-      <ion-label>{{getDisplayMonth(itm.getMonth())}}</ion-label>
+      <h2>{{itm.date| date:'dd'}}</h2>
+      <ion-label>{{getDisplayMonth(itm.date)}}</ion-label>
     </ion-segment-button>
   </ion-segment>
 
   <ion-item>
     <ion-label>Horario</ion-label>
-    <ion-select placeholder="Seleccionar un horario">
-      <ion-select-option *ngFor="let h of rangeHours; let idx = index" value="index">{{h}}</ion-select-option>
+    <ion-select [(ngModel)]="selectedRange" (ionChange)="onHourChanged()" placeholder="Seleccionar un horario">
+      <ion-select-option *ngFor="let h of rangeHours; let idx = index" [value]="h">{{h.range}}</ion-select-option>
     </ion-select>
   </ion-item>
 
-  <ion-card class="summary" color="warning">
+  
+
+  <ion-card *ngIf="dailyRangeSchedule" class="summary" color="{{getColor(dailyRangeSchedule[currentDay].selectableHours[currentHour].capPercentaje)}}">
     <ion-card-header>
-      <ion-card-subtitle>12 Nov, 2020</ion-card-subtitle>
-      <ion-card-title>09:00 - 10:00</ion-card-title>
+      <ion-card-subtitle>{{dailyRangeSchedule[currentDay].date | date:'MMM dd, yyyy'}}</ion-card-subtitle>
+      <ion-card-title>{{dailyRangeSchedule[currentDay].selectableHours[currentHour].range}}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-grid>
@@ -35,7 +40,7 @@
               <strong>Capacidad</strong>
             </div>
             <div>
-              100
+              {{dailyRangeSchedule[currentDay].selectableHours[currentHour].capacity}}
             </div>
           </ion-col>
           <ion-col>
@@ -43,7 +48,7 @@
               <strong>% Ocupacion</strong>
             </div>
             <div>
-              70
+              {{100 - dailyRangeSchedule[currentDay].selectableHours[currentHour].capPercentaje}}
             </div>
           </ion-col>
           <ion-col>
@@ -51,7 +56,7 @@
               <strong>Calendarizados</strong>
             </div>
             <div>
-              45
+              {{data?.length}}
             </div>
           </ion-col>
           <ion-col>
@@ -59,7 +64,7 @@
               <strong>Disponibilidad</strong>  
             </div>
             <div>
-              25
+              {{dailyRangeSchedule[currentDay].selectableHours[currentHour].capPeople}}
             </div>
           </ion-col>
         </ion-row>
@@ -72,7 +77,7 @@
 
       <ion-item class="item ios in-list ion-focusable hydrated item-label">
         <ion-avatar slot="start" class="ios hydrated">
-          <img src="{{selectedMember?.photoUrl}}">
+          <img src="{{basePhotosUrl + selectedMember?.photoUrl}}">
         </ion-avatar>
         <ion-label class="sc-ion-label-ios-h sc-ion-label-ios-s ios hydrated">
           <h3>{{selectedMember?.memberId}}</h3>
@@ -80,12 +85,12 @@
           <p>
             <ion-chip color="secondary">{{selectedMember?.package}}</ion-chip>
             <ion-chip color="secondary">{{selectedMember?.period}}</ion-chip>
-            <ion-chip color="secondary">{{selectedMember?.dueDate}}</ion-chip>
+            <ion-chip color="secondary">{{selectedMember?.dueDate | date:'MMM dd, yyyy'}}</ion-chip>
           </p>
         </ion-label>
       </ion-item>
       <ion-item>
-        <ion-button slot="end" color="gym-primary">
+        <ion-button (click)="onBookMember()" slot="end" color="gym-primary">
           <ion-icon name="add-circle-outline"></ion-icon>
         </ion-button>
         <ion-button slot="end" (click)="onPinMember()" [color]="isMemberPinned ? 'primary' : 'medium'" slot="end">
@@ -104,7 +109,7 @@
     <ion-item-sliding *ngFor="let itm of dataSearched">
       <ion-item class="item ios in-list ion-focusable hydrated item-label">
         <ion-avatar slot="start" class="ios hydrated">
-          <img src="{{itm.photoUrl}}">
+          <img src="{{basePhotosUrl + itm.photoUrl}}">
         </ion-avatar>
         <ion-label class="sc-ion-label-ios-h sc-ion-label-ios-s ios hydrated">
           <h3>{{itm.memberId}}</h3>
@@ -112,13 +117,13 @@
           <p>
             <ion-chip color="secondary">{{itm.package}}</ion-chip>
             <ion-chip color="secondary">{{itm.period}}</ion-chip>
-            <ion-chip color="secondary">{{itm.dueDate}}</ion-chip>
+            <ion-chip color="secondary">{{itm.dueDate | date:'MMM dd, yyyy'}}</ion-chip>
           </p>
         </ion-label>
-        <ion-item-options side="end">
-          <ion-item-option>Remover</ion-item-option>
-        </ion-item-options>
       </ion-item>
+      <ion-item-options side="end">
+        <ion-item-option (click)="onRemoveBookMark(itm.userId)">Remover</ion-item-option>
+      </ion-item-options>
     </ion-item-sliding>
 
   </ion-list>

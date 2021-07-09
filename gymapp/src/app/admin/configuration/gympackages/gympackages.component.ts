@@ -30,7 +30,7 @@ export class GympackagesComponent implements OnInit {
 
     this.gymService.getPackagesList().subscribe(response => {
       this.data = response;
-      console.log(this.data);
+      console.log('packages lists: ', this.data);
     });
 
   }

@@ -14,6 +14,7 @@ export class UsersModalComponent implements OnInit {
 
   @Input() userId: any;
 
+  isMemberIdAlreadyAssigned = false;
   isMemberIdEditable = false;
   uploader: FileUploader;
   baseUrl = environment.photosAPIUrl + 'photos/' + environment.profilesPhotosProjectName + '/' + environment.profilesPhotosFolderName + '/photos/';
@@ -21,6 +22,8 @@ export class UsersModalComponent implements OnInit {
   currentUserPhoto = '';
   currentUser: any;
   memberDetails: any;
+  memberIdEditAvailable = false;
+  memberIdUpdated: any;
   // tslint:disable-next-line:max-line-length
   sourcePhotosPath = environment.profilesPhotosRepoUrl + environment.profilesPhotosProjectName + '/' + environment.profilesPhotosFolderName + '/';
 
@@ -128,5 +131,38 @@ export class UsersModalComponent implements OnInit {
       }
     });
 
+  }
+
+  onEditMemberId() {
+    this.memberIdEditAvailable = true;
+  }
+
+  onUpdateMemberId() {
+    this.gymService.updateMemberId(this.memberDetails.userId, this.memberDetails.memberId, false).subscribe(response => {
+      this.isMemberIdEditable = false;
+      this.memberIdEditAvailable = false;
+
+      if (response) {
+        this.isMemberIdAlreadyAssigned = true;
+        this.memberIdUpdated = response;
+      }
+
+    });
+  }
+
+  onForceUpdateMemberId() {
+    this.gymService.updateMemberId(this.memberDetails.userId, this.memberDetails.memberId, true).subscribe(response => {
+      this.isMemberIdEditable = false;
+      this.memberIdEditAvailable = false;
+      this.isMemberIdAlreadyAssigned = false;
+      this.memberIdUpdated = null;
+    });
+  }
+
+  onCancelUpdateMemberId() {
+    this.isMemberIdEditable = true;
+    this.memberDetails.memberId = null;
+    this.isMemberIdAlreadyAssigned = false;
+    this.memberIdUpdated = null;
   }
 }

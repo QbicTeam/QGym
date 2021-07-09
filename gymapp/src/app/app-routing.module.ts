@@ -48,7 +48,7 @@ const routes: Routes = [
     loadChildren: () => import('./admin/frontdesk/frontdesk.module').then( m => m.FrontdeskPageModule)
   },
   {
-    path: 'frontdeskmanager',
+    path: 'frontdeskmanager/:date/:hour',
     loadChildren: () => import('./admin/frontdeskmanager/frontdeskmanager.module').then( m => m.FrontdeskmanagerPageModule)
   },
   {
@@ -66,6 +66,10 @@ const routes: Routes = [
   {
     path: 'sales-report',
     loadChildren: () => import('./admin/sales-report/sales-report.module').then( m => m.SalesReportPageModule)
+  },
+  {
+    path: 'membersactivation',
+    loadChildren: () => import('./admin/membersactivation/membersactivation.module').then( m => m.MembersactivationPageModule)
   }
 ];
 

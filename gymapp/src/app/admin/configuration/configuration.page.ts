@@ -39,8 +39,6 @@ export class ConfigurationPage implements OnInit {
     this.currentUser = this.securityService.getCurrentLoggedUser();
     this.currentMenu = this.securityService.getMenuByCurrentUserRole();
 
-    console.log(this.currentUser);
-
   }
 
   initSubscriptions() {
@@ -94,12 +92,11 @@ export class ConfigurationPage implements OnInit {
     console.log('loading capacity data...');
     this.gymService.getCapacityData().subscribe(response => {
       this.capacityData = response;
-      console.log('Capacity response: ', response);
     });
   }
 
   loadScheduleData() {
-    this.gymService.getScheduleConfiguration().subscribe(response => {
+    this.gymService.getGeneralSettingsConfiguration().subscribe(response => {
       this.scheduleData = response;
     });
   }
@@ -136,6 +133,15 @@ export class ConfigurationPage implements OnInit {
     else if (option === 'sales') {
       this.router.navigate(['/sales-report']);
     }
+    else if (option === 'activation') {
+      this.router.navigate(['/membersactivation']);
+    }
+  }
+
+
+  logOut() {
+    this.securityService.logOut();
+    this.router.navigateByUrl('/home');
   }
 
 }

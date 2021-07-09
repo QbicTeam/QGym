@@ -7,6 +7,8 @@ import { IonicModule } from '@ionic/angular';
 import { FrontdeskPageRoutingModule } from './frontdesk-routing.module';
 
 import { FrontdeskPage } from './frontdesk.page';
+import { Router } from '@angular/router';
+import { SecurityService } from 'src/app/api/security.service';
 
 @NgModule({
   imports: [
@@ -17,4 +19,14 @@ import { FrontdeskPage } from './frontdesk.page';
   ],
   declarations: [FrontdeskPage]
 })
-export class FrontdeskPageModule {}
+export class FrontdeskPageModule {
+
+  constructor( private router: Router, private securityService: SecurityService) { }
+
+  logOut() {
+    this.securityService.logOut();
+    this.router.navigateByUrl('/home');
+  }
+
+
+}

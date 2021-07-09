@@ -1,41 +1,59 @@
 <ion-header no-border>
-  <div class="login-header ion-padding">
+  <div class="login-header">
     <img src="../../assets/images/logo.png" alt="" class="logo-img">
   </div>
 </ion-header>
 
 
-<ion-content>
+<ion-content *ngIf="currentUser">
 
     <ion-card class="ios hydrated">
-      <img src="https://theskincareedit.com/.image/t_share/MTU2ODk4NDM4MDIyODk5MTQ5/mila-kunis-young-hollywood-awards-2000.jpg">
       <ion-card-header class="ion-inherit-color ios hydrated">
-        <ion-card-subtitle role="heading" aria-level="3" class="ion-inherit-color ios hydrated">Vencimiento: Nov 3, 2020</ion-card-subtitle>
-        <ion-card-title role="heading" aria-level="2" class="ion-inherit-color ios hydrated">Mila Kunis</ion-card-title>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="3">
+              <img class="imgProfile" src="https://theskincareedit.com/.image/t_share/MTU2ODk4NDM4MDIyODk5MTQ5/mila-kunis-young-hollywood-awards-2000.jpg">
+            </ion-col>
+            <ion-col>
+              <ion-card-title role="heading" aria-level="2" class="ion-inherit-color ios hydrated">Socio: {{currentUser.memberId}}</ion-card-title>
+              <ion-item lines="none">
+                <ion-card-subtitle role="heading" aria-level="3" class="ion-inherit-color ios hydrated">{{currentUser.email}}</ion-card-subtitle>
+              </ion-item>
+              <ion-item lines="none">
+                <ion-label slot="start">{{currentUser.membershipTypeActive.name}}</ion-label>
+                <ion-label>Vigencia: {{ currentUser.membershipExpiration | date:'dd MMM, yyyy' }}</ion-label>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       </ion-card-header>
       <ion-card-content class="ios card-content-ios hydrated">
-        <ion-item lines="none">
-          <ion-label>123456</ion-label>
-          <ion-label>Lady Fitness</ion-label>
-        </ion-item>
       </ion-card-content>
     </ion-card>
 
     <ion-list>
       <ion-item>
+        <ion-label position="floating">Nombre: </ion-label>
+        <ion-input [(ngModel)]="currentUser.fullName" placeholder="Nombre Completo" ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Telefono: </ion-label>
+        <ion-input [(ngModel)]="currentUser.phone" placeholder="Telefono" ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Celular: </ion-label>
+        <ion-input [(ngModel)]="currentUser.cellPhone" placeholder="Celular" ></ion-input>
+      </ion-item>
+      <ion-item>
         <ion-label position="floating">F. Nacimiento: </ion-label>
-        <ion-datetime displayFormat="MM DD YY" placeholder="Select Date"></ion-datetime>
+        <ion-datetime [(ngModel)]="currentUser.birthdate" displayFormat="MM DD YY" placeholder="Select Date"></ion-datetime>
       </ion-item>
       <ion-item>
-          <ion-label>Sexo: </ion-label>
-          <ion-select>
-            <ion-select-option>Femenino</ion-select-option>
-            <ion-select-option>Masculino</ion-select-option>
-          </ion-select>
-      </ion-item>
-      <ion-item>
-        <ion-button expand="full" color="gym-primary">
+        <ion-button (click)="onUpdateMemberData()" slot="end" expand="full" color="gym-primary">
           Grabar
+        </ion-button>
+        <ion-button color="light" slot="end" (click)="onExit()">
+          Salir
         </ion-button>
       </ion-item>
     </ion-list>

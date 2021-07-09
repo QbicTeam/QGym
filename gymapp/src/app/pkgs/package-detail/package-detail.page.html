@@ -12,7 +12,7 @@
   <div [innerHTML]="data">
   </div>
 
-  <ion-grid>
+  <ion-grid *ngIf="currentUser && currentPkg.forSale">
     <ion-row>
       <ion-col>
         <ion-button [routerLink]="['/', 'payment', currentPkg.id, currentPkg.name, currentPkg.price]" expand="block" color="gym-primary">Comprar membresia</ion-button>

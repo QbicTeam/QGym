@@ -28,6 +28,11 @@
         <ion-icon slot="start" color="gym-primary" name="{{mnu.icon}}"></ion-icon>
         <ion-label color="gym-primary">{{mnu.displayName}}</ion-label>
       </ion-item>
+
+      <ion-item button transparent (click)="logOut()">
+        <ion-icon slot="start" color="gym-primary" name="log-out-outline"></ion-icon>
+        <ion-label color="gym-primary">Cerrar Sesion</ion-label>
+      </ion-item>
     </ion-list>
 
   </ion-content>
@@ -48,8 +53,8 @@
       <ion-label>Ocupacion</ion-label>
     </ion-segment-button>
     <ion-segment-button value="schedule">
-      <ion-icon name="alarm-outline"></ion-icon>
-      <ion-label>Horarios</ion-label>
+      <ion-icon name="cog-outline"></ion-icon>
+      <ion-label>General</ion-label>
     </ion-segment-button>
     <ion-segment-button value="users">
       <ion-icon name="people-outline"></ion-icon>

@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { GymService } from 'src/app/api/gym.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-selectmember-modal',
@@ -9,15 +10,26 @@ import { GymService } from 'src/app/api/gym.service';
 })
 export class SelectmemberModalComponent implements OnInit {
 
-  data: any[] = [];
-  dataSearched: any[];
+  @Input() currentDate: any;
+  data: any;
+  dataSearched: any;
+  basePhotosUrl = environment.profilesPhotosRepoUrl + environment.profilesPhotosProjectName + '/' + environment.profilesPhotosFolderName + '/';
 
   constructor(private gymService: GymService, private modalCtrl: ModalController) { }
 
   ngOnInit() {
 
-    // this.data = this.gymService.getMembersDetailsList();
-    // this.dataSearched = this.data;
+    console.log(this.currentDate);
+
+    this.gymService.getElelibleMembers(this.currentDate).subscribe(response => {
+      console.log('elegibles', response);
+      this.data = response;
+      this.dataSearched = this.data;
+    });
+
+  }
+
+  loadElegibleMembers() {
 
   }
 

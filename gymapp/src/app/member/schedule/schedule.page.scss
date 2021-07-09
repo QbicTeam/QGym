@@ -126,6 +126,23 @@ h2 {
     color:black;
 }
 
+h3 {
+    color:#fff;
+}
+
+.dateheader {
+    color:#000;
+    padding-bottom: 3px;
+    border-bottom: solid 3px #bf0811;
+}
+
+ion-card {
+    padding: 0;
+}
+
+ion-card-header {
+    padding: 0;
+}
 
 /* side drawer */
 
@@ -195,4 +212,8 @@ h2 {
 
 .menu-items {
     margin: 10px;
+}
+
+.close-session {
+    margin-top:0;
 }

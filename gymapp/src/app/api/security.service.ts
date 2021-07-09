@@ -65,7 +65,8 @@ export class SecurityService {
           role: response.role,
           expiration: response.membershipExpiration,
           photoUrl: response.photoUrl,
-          packageId: response.packageId
+          packageId: response.packageId,
+          memberId: response.memberId
         };
 
         localStorage.setItem('gymToken', response.token);
@@ -73,6 +74,11 @@ export class SecurityService {
 
       }));
 
+  }
+
+  logOut() {
+    localStorage.removeItem('gymToken');
+    localStorage.removeItem('gymUserData');
   }
 
   validateUserForResetPassword(memberId: string): Observable<UserValidationResponseDTO> {
@@ -158,6 +164,15 @@ export class SecurityService {
      return result;
   }
 
+  setNameToCurrentLoggedUser(fullName: string) {
+
+    const data = this.getCurrentLoggedUser();
+
+    data.displayName = fullName;
+    localStorage.setItem('gymUserData', JSON.stringify(data));
+
+  }
+
   checkExpiration(): boolean {
 
     let result = false;
@@ -190,7 +205,7 @@ export class SecurityService {
       result = [ { icon: 'alarm-outline', displayName: 'Mostrador', option: 'frontdesk' },
                   { icon: 'cog-outline', displayName: 'Administrador', option: 'admin' },
                   { icon: 'cash-outline', displayName: 'Reporte de Ventas', option: 'sales' },
-                  { icon: 'cash-outline', displayName: 'Activacion de Membresias', option: 'sales' } ];
+                  { icon: 'cash-outline', displayName: 'Activacion de Membresias', option: 'activation' } ];
     } else {
       result = [ { icon: 'albums-outline', displayName: 'Paquetes', option: 'packages' },
               { icon: 'alarm-outline', displayName: 'Agenda', option: 'schedule' } ];
