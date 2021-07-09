@@ -11,5 +11,6 @@ namespace prometheus.dto.gym.Packages
         public string Period { get; set; }
         public string Name { get; set; }
         public string ShortDescription { get; set; }
+        public bool ForSale { get; set; }
     }
 }

@@ -1,6 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+// using System.Text.Encoding.CodePages;
+//using System.Text.Encoding;
+using ExcelDataReader;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +31,9 @@ using System.Reflection;
 using Payment.DTOs;
 using Microsoft.Extensions.Options;
 using Payment.Utilities;
+using IO = System.IO;
+using System.Data;
+
 //using Microsoft.AspNetCore.Authentication;
 
 namespace QGym.API.Controllers
@@ -490,6 +496,192 @@ namespace QGym.API.Controllers
                 return BadRequest(this._appSettings.Value.ServerError);
             }
 
+        }
+
+        [HttpPost("importByFiles")]
+        public async Task<IActionResult> ImportFiles(PathFiles paths)
+        {
+            var restult = new Imported() 
+            { 
+                MembersImported = new List<MemberImported>(), 
+                MembersUpdateVilidity = new List<MemberImported>() 
+            };
+            try
+            {
+                string memberFile = string.Empty;
+                string validityFile = string.Empty;
+                // string filePath = @"C:\Proyectos\QGym_BK\ExcelFiles\Miembros_210301.xlsx";
+
+                // Validate file of Members. (Finding type file member)
+                using (var stream = IO.File.Open(paths.Path1, IO.FileMode.Open, IO.FileAccess.Read))
+                {
+                    // Auto-detect format, supports:
+                    //  - Binary Excel files (2.0-2003 format; *.xls)
+                    //  - OpenXml Excel files (2007 format; *.xlsx, *.xlsb)
+                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    {
+                        // 2. Use the AsDataSet extension method
+                        var result = reader.AsDataSet();
+                        var hoja = result.Tables[0];
+
+                        // var x = hoja.Rows[0].ItemArray[0].ToString().ToUpper();
+                        // var x2 = hoja.Rows[0][0].ToString().ToUpper();
+
+                        if (hoja.Rows[0][0].ToString().ToUpper() == "EMPRESA")
+                        {
+                            memberFile = paths.Path1;
+                            validityFile = paths.Path2;
+                        }
+                        else
+                        {
+                            memberFile = paths.Path2;
+                            validityFile = paths.Path1;
+                        }
+                    }
+                }
+
+                // Get all members
+                var membersDb = await this._repo.GetMembersToList();
+                var membersListDb = _mapper.Map<List<Member>, List<MemberToListDTO>>(membersDb.ToList());
+
+                // Working with customers
+                using (var stream = IO.File.Open(memberFile, IO.FileMode.Open, IO.FileAccess.Read))
+                {
+                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    {
+                        var result = reader.AsDataSet();
+                        var hoja = result.Tables[0];
+                        var memberRole = await this._repo.GetRoleByName("Miembro");
+
+                        foreach (DataRow row in hoja.Rows)
+                        {
+                            if (row[4].ToString().ToUpper() == "CELULAR") // Omitir el primer renglon.
+                                continue;
+
+                            var memberId = row[1].ToString(); // Clave Unica (MemberId)
+                            var memberFinded  = membersListDb.FirstOrDefault(m => m.MemberId == memberId);
+
+                            if (memberFinded != null)
+                                continue;
+
+                            // Add new Member.
+                            var userToCreate = new User
+                            {
+                                UserName = row[6].ToString(), // Email
+                                DisplayName = row[3].ToString(), // Nombre
+                                Role = memberRole, // Miembro
+                                IsActive = true,
+                                CreationDate = DateTime.Now,
+                                LastModificationDate = DateTime.Now
+                            };
+
+                            // Get BirthDate in datetime.
+                            var oldStr = row[10].ToString(); // Edad
+                            var dayMonStr = row[11].ToString(); // Cumpleaños
+                            var day = Convert.ToInt32(dayMonStr.Substring(0,2));
+                            var monStr = dayMonStr.Substring(3, 3);
+                            int mon = 0;
+                            switch (monStr)
+                            {
+                                case "ene":
+                                    mon = 1;
+                                    break;
+                                case "feb":
+                                    mon = 2;
+                                    break;
+                                case "mar":
+                                    mon = 3;
+                                    break;
+                                case "abr":
+                                    mon = 4;
+                                    break;
+                                case "may":
+                                    mon = 5;
+                                    break;
+                                case "jun":
+                                    mon = 6;
+                                    break;
+                                case "jul":
+                                    mon = 7;
+                                    break;
+                                case "ago":
+                                    mon = 8;
+                                    break;
+                                case "sep":
+                                    mon = 9;
+                                    break;
+                                case "oct":
+                                    mon = 10;
+                                    break;
+                                case "nov":
+                                    mon = 11;
+                                    break;
+                                case "dic":
+                                    mon = 12;
+                                    break;
+                            }
+                            var year = DateTime.Now.AddYears(Convert.ToInt32(oldStr) * -1).Year;
+                            var birthdate = new DateTime(year, mon, day, 0, 0, 0);
+
+                            var memberToCreate = new Member() { 
+                                User = userToCreate,
+                                CellPhone = row[4].ToString(),
+                                Phone = row[5].ToString(),
+                                Birthdate = birthdate
+                            };
+
+                            if (string.IsNullOrEmpty(userToCreate.UserName))
+                                userToCreate.UserName = row[1].ToString();
+
+
+                            // Create a Member
+                            var memberCreated = await this._repo.Register(memberToCreate, memberId);
+
+                            var memImp = new MemberImported() { MemberId = memberId, Name = memberCreated.User.DisplayName };
+                            restult.MembersImported.Add(memImp);
+                        }
+                    }
+                }
+
+                // Working with validity.
+                using (var stream = IO.File.Open(validityFile, IO.FileMode.Open, IO.FileAccess.Read))
+                {
+                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    {
+                        var result = reader.AsDataSet();
+                        var hoja = result.Tables[0];
+
+                        foreach (DataRow row in hoja.Rows)
+                        {
+                            var encabezado = row[0].ToString().ToUpper().Substring(0, 3);
+                            if (encabezado == "MEM" || encabezado == "CLA") // Omitir el primer renglon.
+                                continue;
+
+                            var memberId = row[0].ToString(); // Clave Unica (MemberId)
+                            var memDb = await this._repo.GetMember(null, memberId, 0);
+
+                            if (memDb == null)
+                                continue;
+
+                            var venc = DateTime.Parse(row[4].ToString());
+                            if (memDb.MembershipExpiration < venc)
+                            {
+                                memDb.MembershipExpiration = venc;
+                                await this._repo.SaveAll();
+                                var memUp = new MemberImported() { MemberId = memDb.MemberId, Name = memDb.User.DisplayName, MembershipExpiration = memDb.MembershipExpiration };
+                                restult.MembersUpdateVilidity.Add(memUp);
+                            }
+                        }
+                    }
+                }
+                
+                return Ok(restult);
+            }
+            catch (Exception ex)
+            {
+                new FileManagerHelper().RecordLogFile(MethodBase.GetCurrentMethod().ReflectedType.FullName, paths, ex);
+                return BadRequest(this._appSettings.Value.ServerError);
+            }
         }
     }
 }
