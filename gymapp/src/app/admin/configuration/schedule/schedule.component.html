@@ -1,4 +1,4 @@
-<ion-grid>
+<ion-grid *ngIf="data">
   <ion-row>
     <ion-col>
       <ion-label>
@@ -10,7 +10,23 @@
     <ion-col>
       <ion-item transparent>
         <ion-label position="floating">Horas antes</ion-label>
-        <ion-input [(ngModel)]="data" placeholder="Horas" type="text"></ion-input>
+        <ion-input [(ngModel)]="data.scheduleChangeHours" placeholder="Horas" type="number"></ion-input>
+      </ion-item>  
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col>
+      <ion-item transparent>
+        <ion-label position="floating">Costo de Inscripcion</ion-label>
+        <ion-input [(ngModel)]="data.registrationCost" placeholder="Costo de Inscripcion" type="number"></ion-input>
+      </ion-item>  
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col>
+      <ion-item transparent>
+        <ion-label position="floating">Costo de Reinscripcion</ion-label>
+        <ion-input [(ngModel)]="data.reregistrationCost" placeholder="Costo de Reinscripcion" type="number"></ion-input>
       </ion-item>  
     </ion-col>
   </ion-row>

@@ -1,10 +1,10 @@
-<ion-card color="gym-primary">
+<ion-card color="gym-primary" *ngIf="currentMsg">
   <ion-card-header>
-    <ion-card-subtitle>19.nov.2020
+    <ion-card-subtitle>{{currentMsg.publishDate}}
     </ion-card-subtitle>
     <ion-card-title>
       <ion-item transparent lines="none">
-        <ion-card-title slot="start">COVID-19</ion-card-title>
+        <ion-card-title slot="start">{{currentMsg.title}}</ion-card-title>
         <ion-button color="light" (click)="onCollapse()" slot="end" >
           <ion-icon *ngIf="!covidCollapsed" name="arrow-down-circle-outline"></ion-icon>
           <ion-icon *ngIf="covidCollapsed" name="arrow-up-circle-outline"></ion-icon>  
@@ -15,12 +15,12 @@
   <ion-card-content *ngIf="covidCollapsed">
 
     <ion-label>
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet nemo libero ipsam provident cupiditate optio nam itaque commodi culpa qui debitis, aliquam, adipisci totam tenetur minus repudiandae inventore natus delectus, porro pariatur molestias a. Quos, sapiente velit hic, odio magnam corporis perferendis nemo voluptate, voluptas vel dicta similique veniam fuga atque vero delectus aliquid incidunt pariatur accusamus. Quia reiciendis dolor quibusdam doloribus voluptatibus itaque dolores excepturi rem, minima cum amet perspiciatis voluptas vitae suscipit qui maiores nobis. Eum quisquam id eveniet eligendi possimus, porro officiis commodi, pariatur dicta ipsum labore nostrum veniam aut iure non cupiditate deserunt necessitatibus optio? Excepturi.
+      {{currentMsg.message}}
     </ion-label>
 
     <ion-item transparent lines="none">
       <ion-label>No volver a mostrar</ion-label>
-      <ion-checkbox slot="end"></ion-checkbox>  
+      <ion-checkbox [(ngModel)]="hideMessage" (click)="onCheckStatus()" slot="end"></ion-checkbox>  
     </ion-item>
   </ion-card-content>
 </ion-card>

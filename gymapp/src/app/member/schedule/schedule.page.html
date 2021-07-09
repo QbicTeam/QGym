@@ -11,11 +11,12 @@
   <ion-content>
     <div class="menu-header-bg"></div>
     <div class="header-content">
-      <img src="https://i.pinimg.com/originals/c3/45/05/c34505eb63edc65300a690f1ad903799.jpg" alt="">
+      <img src="{{basePhotosUrl + currentUser.photoUrl}}" alt="">
       <ion-label>
-        <h2>Mila Kunis</h2>
-        <p>Socio: 12345</p>
-        <p><ion-badge color="light">Administrador</ion-badge></p>
+        <h2>{{currentUser.displayName}}</h2>
+        <h3>{{currentUser.email}}</h3>
+        <p>Socio: {{currentUser.memberId}}</p>
+        <p><ion-badge color="light">{{currentUser.expiration | date:'dd MMM, yyyy'}}</ion-badge></p>
       </ion-label>
     </div>
     <div class="action-button">
@@ -29,9 +30,17 @@
         <ion-icon slot="start" color="gym-primary" name="{{mnu.icon}}"></ion-icon>
         <ion-label color="gym-primary">{{mnu.displayName}}</ion-label>
       </ion-item>
+
+      <ion-item button transparent (click)="logOut()">
+        <ion-icon slot="start" color="gym-primary" name="log-out-outline"></ion-icon>
+        <ion-label color="gym-primary">Cerrar Sesion</ion-label>
+      </ion-item>
+
     </ion-list>
 
+
   </ion-content>
+
 </ion-menu>
 
 
@@ -41,49 +50,50 @@
   <ion-grid>
     <ion-row>
       <ion-col size-xs='12' size-sm='6'>
-        <app-covidalert></app-covidalert>
+        <app-covidalert [currentMsg]="covidMsg"></app-covidalert>
       </ion-col>
       <ion-col size-xs='12' size-sm='6'>
-        <app-schedulesummary [memberSchedule]="memberSchedule"></app-schedulesummary>
+        <app-schedulesummary [memberSchedule]="scheduleSummary"></app-schedulesummary>
       </ion-col>
     </ion-row>
-    <ion-row *ngIf="memberSchedule[0].bookedHour">
+    <ion-row *ngIf="todayBooked">
       <ion-col>
         <ion-button (click)="showReservation()" expand="block" size="small">
           <ion-icon slot="start" name="alarm-outline"></ion-icon>
-          Mi Reservacion: {{memberSchedule[0].bookedHour}}
+          Mi Reservacion: {{todayBooked.bookedHour}}
         </ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>
 
-
-
-
   <ion-segment scrollable="true" [(ngModel)]="currentDay">
-    <ion-segment-button (click)="goto(idx)" *ngFor="let itm of memberSchedule; let idx = index" value="{{idx}}">
-      <h2>{{itm.date.getDate()}}</h2>
-      <ion-label>{{getDisplayMonth(itm.date.getMonth())}}</ion-label>
+    <ion-segment-button (click)="goto(idx)" *ngFor="let itm of scheduleWeekDays; let idx = index" value="{{idx}}">
+      <h2>{{itm .date| date:'dd'}}</h2>
+      <ion-label>{{getDisplayMonth(itm.date)}}</ion-label>
     </ion-segment-button>
   </ion-segment>
 
   <ion-slides [options]="sliderConfig" #slides (ionSlideDidChange)="getIndex($event)">
 
-    <ion-slide *ngFor="let d of memberSchedule; let sidx = index" data-id={{sidx}}>
+    <ion-slide *ngFor="let d of scheduleWeekDays; let sidx = index" data-id={{sidx}}>
         <ion-card class="scheduleCard">        
           <ion-card-header>
-            <h3>{{d.date | date:'MMM dd, yyyy'}}</h3>
+            <h3 class="dateheader">{{d.date | date:'MMM dd, yyyy'}}</h3>
           </ion-card-header>
           <ion-card-content class="ion-no-padding">
             <ion-list>
-              <ion-item color="trasparent" *ngFor="let itm of d.selectableHours" lines="none" class="item ios in-list ion-focusable hydrated item-label">
-                <ion-label slot="start" class="sc-ion-label-ios-h sc-ion-label-ios-s ios hydrated">
-                  <h2>{{itm.range}}</h2>
+
+              <ion-item color="transparent" lines="none" *ngFor="let itm of d.selectableHours">
+                <ion-label slot="start">
+                  <h2><strong>{{itm.range}}</strong></h2>
+                  <h2>
+                    <ion-badge *ngIf="itm.capacity && itm.capacity <= 10" color="gym-primary">Disponibles: {{itm.capacity}}</ion-badge>
+                  </h2>
                 </ion-label>
-                <ion-badge *ngIf="itm.capacity && itm.capacity > 74 && itm.capacity < 100" color="gym-primary">{{itm.capacity}} %</ion-badge>
-                <!-- <ion-icon *ngIf="itm.capacity && itm.capacity > 74 && itm.capacity < 100" color="danger" name="warning-outline"></ion-icon> -->
-                <ion-toggle [(ngModel)]="itm.booked" *ngIf="!itm.capacity || itm.capacity !== 100" color="gym-primary" slot="end"></ion-toggle>
+                <ion-toggle (click)="updateReservation(d.date, itm.booked, itm.range, itm, d)" [(ngModel)]="itm.booked" *ngIf="!itm.capacity || itm.capacity > 0 || itm.booked" color="gym-primary" slot="end"></ion-toggle>
               </ion-item>
+
+              
             </ion-list>
           </ion-card-content>
         </ion-card>        

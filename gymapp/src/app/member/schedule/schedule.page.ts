@@ -5,6 +5,9 @@ import { CheckinComponent } from '../checkin/checkin.component';
 import { ProfileComponent } from '../profile/profile.component';
 import { Router } from '@angular/router';
 import { SecurityService } from 'src/app/api/security.service';
+import { environment } from 'src/environments/environment';
+import { SharedService } from 'src/app/api/shared.service';
+import { PackageDetailPageRoutingModule } from 'src/app/pkgs/package-detail/package-detail-routing.module';
 
 @Component({
   selector: 'app-schedule',
@@ -16,6 +19,12 @@ export class SchedulePage implements OnInit {
   currentDay = 0;
   scheduleCollapsed = false;
   currentMenu: any;
+  currentUser: any;
+  basePhotosUrl = environment.profilesPhotosRepoUrl + environment.profilesPhotosProjectName + '/' + environment.profilesPhotosFolderName + '/';
+  covidMsg: any;
+  scheduleSummary: any;
+  scheduleWeekDays: any;
+  todayBooked: any;
 
   sliderConfig = {
     initialSlide: 0,
@@ -27,13 +36,28 @@ export class SchedulePage implements OnInit {
   @ViewChild('slides', {static: false}) slides: IonSlides;
 
   constructor(private gymService: GymService, private securityService: SecurityService,
-              private modalCtrl: ModalController, private router: Router) {
+              private modalCtrl: ModalController, private router: Router,
+              private sharedService: SharedService) {
    }
 
   ngOnInit() {
     this.memberSchedule = this.gymService.getMemberSchedule(123);
+
+    this.currentUser = this.securityService.getCurrentLoggedUser();
     this.currentMenu = this.securityService.getMenuByCurrentUserRole();
-    console.log(this.currentMenu);
+
+    this.sharedService.onUpdateData.subscribe(value => {
+      if (value === 'profile') {
+        this.currentUser = this.securityService.getCurrentLoggedUser();
+      }
+    });
+
+  }
+
+  ionViewDidEnter() {
+    this.loadCovidMessage();
+    this.loadScheduleSummaryData();
+    this.loadScheduleWeekDays();
   }
 
   checkScreen() {
@@ -48,12 +72,15 @@ export class SchedulePage implements OnInit {
       case 701 <= innerWidth && innerWidth <= 900:
         return 3.3;
       case 901 <= innerWidth:
-        return 4.3;
+        return 3.3;
     }
 
   }
 
-  getDisplayMonth(month: number) {
+  getDisplayMonth(date: any) {
+
+    const itmDate = new Date(date);
+    const month = itmDate.getMonth();
 
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
@@ -76,6 +103,7 @@ export class SchedulePage implements OnInit {
 
   getFormmattedDate(date) {
     let result = '';
+    console.log('determinar dia: ', date);
 
     const weekDays = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
 
@@ -89,7 +117,8 @@ export class SchedulePage implements OnInit {
 
   async checkIn() {
     const modal = await this.modalCtrl.create({
-      component: CheckinComponent
+      component: CheckinComponent,
+      componentProps: { date: this.todayBooked.date, bookedHour: this.todayBooked.bookedHour }
     });
 
     await modal.present();
@@ -130,4 +159,74 @@ export class SchedulePage implements OnInit {
 
   }
 
+  loadCovidMessage() {
+    this.gymService.getCovidMessage().subscribe(response => {
+      this.covidMsg = response;
+    });
+  }
+
+  loadScheduleSummaryData() {
+
+    this.gymService.getMemberScheduleSummaryByUserId(this.currentUser.id).subscribe(response => {
+      this.scheduleSummary = response;
+      this.checkTodayBook();
+    });
+  }
+
+  checkTodayBook() {
+
+    if (!this.scheduleSummary || this.scheduleSummary.length === 0) {
+      return;
+    }
+
+    const bookedDate = new Date(this.scheduleSummary[0].date);
+    const today = new Date();
+
+    if (bookedDate.getMonth === today.getMonth && bookedDate.getDate() === today.getDate()) {
+      this.todayBooked = this.scheduleSummary[0];
+    }
+
+  }
+
+  loadScheduleWeekDays() {
+    this.gymService.getScheduleWeekly(this.currentUser.id).subscribe(response => {
+      this.scheduleWeekDays = response;
+    });
+  }
+
+  updateReservation(date: any, status: any, range: any, schedule: any, daily: any) {
+
+    const selDate = new Date(date);
+
+    const month = '00' + (selDate.getMonth() + 1);
+    const day = '00' + selDate.getDate();
+
+    const formattedDate = selDate.getFullYear() + month.substring(month.length - 2) + day.substring(day.length - 2);
+    const formattedHour = range.substring(0, 5).replace(':', '');
+
+    if (!status) {
+      this.gymService.bookMemberDate(this.currentUser.id, formattedDate, formattedHour).subscribe(response => {
+        this.gymService.getScheduleByDayAndUser(this.currentUser.id, date).subscribe(resp => {
+          daily.selectableHours = resp.selectableHours;
+          this.loadScheduleSummaryData();
+        });
+      }, error => {
+        schedule.booked = status;
+      });
+    } else {
+      this.gymService.deleteMemberDate(this.currentUser.id, formattedDate, formattedHour).subscribe(() => {
+        this.gymService.getScheduleByDayAndUser(this.currentUser.id, date).subscribe(resp => {
+          daily.selectableHours = resp.selectableHours;
+          this.loadScheduleSummaryData();
+        });
+
+      });
+    }
+
+  }
+
+  logOut() {
+    this.securityService.logOut();
+    this.router.navigateByUrl('/home');
+  }
 }

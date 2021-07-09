@@ -1,7 +1,7 @@
-<ion-card color="medium">
+<ion-card color="medium" *ngIf="memberSchedule">
   <ion-card-header>
-    <ion-card-subtitle>{{memberSchedule[0].date | date:'MMM dd, yyyy'}} - 
-      {{memberSchedule[memberSchedule.length-1].date | date:'MMM dd, yyyy'}}</ion-card-subtitle>
+    <ion-card-subtitle>{{memberSchedule[0]?.date | date:'MMM dd, yyyy'}} - 
+      {{memberSchedule[memberSchedule.length-1]?.date | date:'MMM dd, yyyy'}}</ion-card-subtitle>
     <ion-item transparent lines="none">
         <ion-card-title slot="start">Mi Horario</ion-card-title>
         <ion-button color="light" (click)="onCollapse()" slot="end" >
@@ -27,7 +27,7 @@
 
     <ion-item transparent lines="none">
       <ion-label>No volver a mostrar</ion-label>
-      <ion-checkbox slot="end"></ion-checkbox>  
+      <ion-checkbox [(ngModel)]="hideMessage" (click)="onCheckStatus()" slot="end"></ion-checkbox>  
     </ion-item>
 
   </ion-card-content>

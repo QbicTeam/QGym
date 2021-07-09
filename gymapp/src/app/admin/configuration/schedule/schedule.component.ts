@@ -15,7 +15,7 @@ export class ScheduleComponent implements OnInit {
   ngOnInit() {}
 
   onUpdateConfiguration() {
-    this.gymService.updateScheduleConfiguration(this.data).subscribe(() => {
+    this.gymService.updateGeneralSettingConfiguration(this.data).subscribe(() => {
 
     });
   }

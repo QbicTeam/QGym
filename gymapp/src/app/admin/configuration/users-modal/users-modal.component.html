@@ -29,10 +29,39 @@
       </ion-col>
       <ion-col>
 
-        <ion-item transparent>
-          <ion-label position="floating">No. Socio</ion-label>
-          <ion-input [disabled]="!isMemberIdEditable" [(ngModel)]="memberDetails.memberId" placeholder="Introducir el numero de socio" type="text"></ion-input>
+        <ion-item *ngIf="isMemberIdEditable && !memberIdEditAvailable">
+          <ion-button expand="block" (click)="onEditMemberId()" fill="outline">Asignar No. Socio</ion-button>
         </ion-item>
+
+        <ion-item transparent *ngIf="memberIdEditAvailable">
+          <ion-label position="floating">No. Socio</ion-label>
+          <ion-input [(ngModel)]="memberDetails.memberId" placeholder="Introducir el numero de socio" type="text"></ion-input>
+          <ion-button expand="block" (click)="onUpdateMemberId()" fill="outline">Actualizar No. Socio</ion-button>
+        </ion-item>
+
+        <ion-item *ngIf="!isMemberIdEditable">
+          <ion-label>No. Socio</ion-label>
+          <ion-label>{{memberDetails.memberId}}</ion-label>
+        </ion-item>
+
+        <div *ngIf="isMemberIdAlreadyAssigned">
+
+          <ion-item>
+            <ion-label>Actualmente asignado a:</ion-label>
+            <ion-label>{{memberIdUpdated.fullName}}</ion-label>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>El numero de socio ya se encuentra asignado desea remplazarlo</ion-label>
+          </ion-item>
+
+
+          <ion-item>
+            <ion-button (click)="onForceUpdateMemberId()" fill="outline">Si</ion-button>
+            <ion-button (click)="onCancelUpdateMemberId()" color="danger">No</ion-button>
+          </ion-item>
+  
+        </div>
 
         <ion-item lines="none">
           <ion-chip *ngIf="memberDetails.isBlock" color="danger">Bloqueado</ion-chip>
@@ -62,13 +91,32 @@
 
    <ion-item transparent>
       <ion-label position="floating">Telefono:</ion-label>
-      <ion-input placeholder="Capturar un numero telefonico" type="text"></ion-input>
-   </ion-item>
+      <ion-input [(ngModel)]="memberDetails.phone" placeholder="Capturar un numero telefonico" type="text"></ion-input>
+    </ion-item>
 
+    <ion-item transparent>
+      <ion-label position="floating">Celular:</ion-label>
+      <ion-input [(ngModel)]="memberDetails.cellPhone" placeholder="Capturar un numero celular" type="text"></ion-input>
+   </ion-item>
+  
   <ion-item>
     <ion-label>F. Nacimiento</ion-label>
-    <ion-datetime displayFormat="MM DD YY" placeholder="Seleccionar"></ion-datetime>
+    <ion-datetime [(ngModel)]="memberDetails.birthdate" displayFormat="MM DD YY" placeholder="Seleccionar"></ion-datetime>
   </ion-item>
+
+  <ion-item>
+    <ion-label slot="start">Cobrar Inscripcion</ion-label>
+  </ion-item>      
+  <ion-item>
+    <ion-toggle [(ngModel)]="memberDetails.chargeRegistration"></ion-toggle>
+  </ion-item>      
+
+  <ion-item>
+    <ion-label>Cobrar Inscripcion</ion-label>
+  </ion-item>      
+  <ion-item>
+    <ion-toggle [(ngModel)]="memberDetails.chargeReregistration"></ion-toggle>
+  </ion-item>      
 
   <ion-item transparent>
     <ion-label slot="start">Paquete: </ion-label>

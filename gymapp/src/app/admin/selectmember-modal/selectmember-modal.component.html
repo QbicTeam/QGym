@@ -11,7 +11,7 @@
   <ion-list>
       <ion-item button (click)="onMemberSelected(itm)" *ngFor="let itm of dataSearched" class="item ios in-list ion-focusable hydrated item-label">
         <ion-avatar slot="start" class="ios hydrated">
-          <img src="{{itm.photoUrl}}">
+          <img src="{{basePhotosUrl + itm.photoUrl}}">
         </ion-avatar>
         <ion-label class="sc-ion-label-ios-h sc-ion-label-ios-s ios hydrated">
           <h3>{{itm.memberId}}</h3>
@@ -19,7 +19,7 @@
           <p>
             <ion-chip color="secondary">{{itm.package}}</ion-chip>
             <ion-chip color="secondary">{{itm.period}}</ion-chip>
-            <ion-chip color="secondary">{{itm.dueDate}}</ion-chip>
+            <ion-chip color="secondary">{{itm.dueDate | date:'MMM dd, yyyy'}}</ion-chip>
           </p>
         </ion-label>
         <ion-item-options side="end">

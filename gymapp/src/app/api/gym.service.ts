@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { CovidMessageResponseDTO } from '../_models/CovidMessageResponseDTO';
+import { DailyScheduleResponseDTO } from '../_models/DailyScheduleResponseDTO';
 import { DownloadSalesReportResponseDTO } from '../_models/DownloadSalesReportReponseDTO';
 import { PackageFullDescriptionResponseDTO } from '../_models/PackageFullDescriptionResponseDTO';
 
@@ -82,11 +84,25 @@ export class GymService {
     return this.http.get(url);
   }
 
+  getGeneralSettingsConfiguration() {
+    const url = this.baseUrl + 'admin/settings/general';
+
+    return this.http.get(url);
+  }
+
   updateScheduleConfiguration(previousHours: any) {
 
     const url = this.baseUrl + 'schedule/' + previousHours;
 
     return this.http.put(url, null);
+
+  }
+
+  updateGeneralSettingConfiguration(dataToSave: any) {
+
+    const url = this.baseUrl + 'admin/settings/general';
+
+    return this.http.put(url, dataToSave);
 
   }
 
@@ -104,71 +120,6 @@ export class GymService {
     return this.http.put(url, memberData);
 
   }
-
-  // getMembersDetailsList() {
-
-  //   const data = [
-  //     {
-  //       memberId: 12345,
-  //       fullName: 'Camila Sodi',
-  //       email: 'camilasodi@gmail.com',
-  //       package: 'Familiar',
-  //       period: '12 days',
-  //       dueDate: 'Nov 12, 2020',
-  //       photoUrl: 'https://image.shutterstock.com/image-photo/beauty-asian-woman-face-portrait-260nw-607071935.jpg',
-  //       searchText: '12345 Camila Sodi camilasodi@gmail.com'
-  //     },
-  //     {
-  //       memberId: 67890,
-  //       fullName: 'Emma artenton',
-  //       email: 'emma@hotmail.com',
-  //       package: 'Personal',
-  //       period: '20 days',
-  //       dueDate: 'Oct 12, 2020',
-  // tslint:disable-next-line:max-line-length
-  //       photoUrl: 'https://thumbs.dreamstime.com/b/beauty-woman-face-portrait-beautiful-spa-model-girl-perfect-fresh-clean-skin-youth-skin-care-concept-brunette-female-63494003.jpg',
-  //       searchText: '67890 Emma artenton emma@hotmail.com'
-  //     },
-  //     {
-  //       memberId: 24680,
-  //       fullName: 'Anne Hateway',
-  //       email: 'anne@gmail.com',
-  //       package: 'Femenil',
-  //       period: '9 days',
-  //       dueDate: 'Sep 20, 2020',
-  // tslint:disable-next-line:max-line-length
-  //       photoUrl: 'https://banner2.cleanpng.com/20180723/lho/kisspng-plastic-surgery-cosmetics-woman-face-skin-care-model-5b5605a8b02fd8.3457753715323642007217.jpg',
-  //       searchText: '24680 Anne Hateway anne@gmail.com'
-  //     },
-  //   ];
-
-  //   return data;
-
-  // }
-
-
-  // getCapacityList() {
-
-  //   const data = [
-  //     {
-  //       startDate: '01/Jun/2020',
-  //       endDate: '01/Ago/2020',
-  //       percentage: 30,
-  //       totalUsers: 40,
-  //       remainingDays: -20
-  //     },
-  //     {
-  //       startDate: '02/Ago/2020',
-  //       endDate: '01/Dic/2020',
-  //       percentage: 50,
-  //       totalUsers: 80,
-  //       remainingDays: 100
-  //     }
-
-  //   ];
-
-  //   return data;
-  // }
 
   getPackagesList() {
 
@@ -201,6 +152,16 @@ export class GymService {
 
   }
 
+  updateMemberId(userId: number, memberId: number, force: boolean) {
+
+    let url = this.baseUrl + 'members/' + userId + '/' + memberId;
+
+    if (force) {
+      url = url + '/force';
+    }
+
+    return this.http.put(url, null);
+  }
 
 
 
@@ -465,4 +426,127 @@ export class GymService {
     return this.http.get<DownloadSalesReportResponseDTO>(url);
 
   }
+
+  getCovidMessage(): Observable<CovidMessageResponseDTO> {
+
+    const url = this.baseUrl + 'admin/settings/CovidMsg';
+
+    return this.http.get<CovidMessageResponseDTO>(url);
+
+  }
+
+  getMemberScheduleSummaryByUserId(userId) {
+
+    const url = this.baseUrl + 'members/' + userId + '/schedule/summary';
+
+    return this.http.get(url);
+
+  }
+
+  getScheduleWeekly(userId) {
+
+    const url = this.baseUrl + 'members/' + userId + '/schedule/weekly';
+
+    return this.http.get(url);
+
+  }
+
+  getFrontDeskScheduleWeekly() {
+
+    const url = this.baseUrl + 'admin/schedule/weekly';
+
+    return this.http.get(url);
+
+  }
+
+
+  getScheduleByDayAndUser(userId: any, date: any): Observable<DailyScheduleResponseDTO> {
+
+    const selDate = new Date(date);
+
+    const month = '00' + (selDate.getMonth() + 1);
+    const day = '00' + selDate.getDate();
+
+    const formattedDate = selDate.getFullYear() + month.substring(month.length - 2) + day.substring(day.length - 2);
+
+    const url = this.baseUrl + 'members/' + userId + '/schedule/' + formattedDate;
+
+    return this.http.get<DailyScheduleResponseDTO>(url);
+
+  }
+
+  bookMemberDate(userId: any, date: any, hour: any) {
+
+    const url = this.baseUrl + 'members/' + userId + '/schedule';
+
+    const requestData = {
+      date,
+      hour
+    };
+
+    console.log(requestData);
+
+    return this.http.post(url, requestData);
+
+  }
+
+  deleteMemberDate(userId: any, date: any, hour: any) {
+
+    const url = this.baseUrl + 'members/' + userId + '/schedule/' + date + '/' + hour;
+
+    console.log(url);
+
+    return this.http.delete(url);
+
+  }
+
+  getBookedMembers(date: Date, hour: string) {
+
+    const selDate = new Date(date);
+
+    const month = '00' + (selDate.getMonth() + 1);
+    const day = '00' + selDate.getDate();
+
+    const formattedDate = selDate.getFullYear() + month.substring(month.length - 2) + day.substring(day.length - 2);
+
+    const formmatedHour = hour.substring(0, 2) + hour.substring(3, 5);
+
+    const url = this.baseUrl + 'admin/schedule/' + formattedDate + '/' + formmatedHour + '/booked/members ';
+
+    console.log(url);
+
+    return this.http.get(url);
+
+
+  }
+
+  getElelibleMembers(date) {
+
+    const selDate = new Date(date);
+
+    const month = '00' + (selDate.getMonth() + 1);
+    const day = '00' + selDate.getDate();
+
+    const formattedDate = selDate.getFullYear() + month.substring(month.length - 2) + day.substring(day.length - 2);
+
+    const url = this.baseUrl + 'admin/members/' + formattedDate + '/elegibles';
+
+    return this.http.get(url);
+
+  }
+
+  payMembership(userId, pkgId, price) {
+
+    const requestData = {
+      MemberschipTypeId: pkgId,
+      Amount: price
+    };
+
+    const url = this.baseUrl + 'Payment/' + userId;
+
+    return this.http.post(url, requestData);
+
+
+  }
+
 }

@@ -26,6 +26,8 @@ export class PackagesPage implements OnInit {
   ionViewDidEnter() {
     this.gymService.getPackagesListInfo().subscribe(response => {
 
+      console.log('Getting package list....', response, this.securityService.getCurrentLoggedUser());
+
       const result = response;
       this.data = new Array<any>();
 
@@ -33,6 +35,7 @@ export class PackagesPage implements OnInit {
         this.data.push(
           {
             id: itm.id,
+            forSale: itm.forSale,
             price: itm.price,
             name: itm.name,
             period: itm.period,
@@ -76,6 +79,9 @@ export class PackagesPage implements OnInit {
     }
   }
 
-
+  logOut() {
+    this.securityService.logOut();
+    this.router.navigateByUrl('/home');
+  }
 
 }

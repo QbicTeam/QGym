@@ -38,8 +38,10 @@ export class FrontdeskPage implements OnInit {
     this.currentUser = this.securityService.getCurrentLoggedUser();
     this.currentMenu = this.securityService.getMenuByCurrentUserRole();
 
-    this.generalSchedule = this.gymService.getGeneralSchedule();
+    // this.generalSchedule = this.gymService.getGeneralSchedule();
+    this.loadScheduleWeekDays();
   }
+
 
   goto(slideNumber) {
     this.slides.slideTo(slideNumber, 2000);
@@ -61,7 +63,10 @@ export class FrontdeskPage implements OnInit {
     }
   }
 
-  getDisplayMonth(month: number) {
+  getDisplayMonth(date: number) {
+
+    const itmDate = new Date(date);
+    const month = itmDate.getMonth();
 
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
@@ -91,6 +96,8 @@ export class FrontdeskPage implements OnInit {
   }
 
   getAvailability(scheduleDate, hour) {
+
+    scheduleDate = new Date(scheduleDate);
 
     let result = true;
 
@@ -139,8 +146,44 @@ export class FrontdeskPage implements OnInit {
     else if (option === 'sales') {
       this.router.navigate(['/sales-report']);
     }
+    else if (option === 'activation') {
+      this.router.navigate(['/membersactivation']);
+    }
 
 }
 
+loadScheduleWeekDays() {
+  this.gymService.getFrontDeskScheduleWeekly().subscribe(response => {
+    console.log(response);
+    this.generalSchedule = response;
+  });
+}
+
+getFormmatedDate(date: any) {
+
+  const sourceDate = new Date(date);
+
+  const month = '00' + (sourceDate.getMonth() + 1);
+  const day = '00' + sourceDate.getDate();
+
+  const formmatedDate = sourceDate.getFullYear() + month.substring(month.length - 2) + day.substring(day.length - 2);
+
+  return formmatedDate;
+}
+
+getFormmatedHour(range: any) {
+
+
+  const formmatedHour = range.substring(0, 2) + range.substring(3, 5);
+
+
+  return formmatedHour;
+}
+
+
+logOut() {
+  this.securityService.logOut();
+  this.router.navigateByUrl('/home');
+}
 
 }

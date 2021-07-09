@@ -1,5 +1,4 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-schedulesummary',
@@ -10,10 +9,14 @@ export class SchedulesummaryComponent implements OnInit {
 
   @Input() memberSchedule: any;
   scheduleCollapsed = false;
+  hideMessage = false;
 
-  constructor(private modalCtrl: ModalController) { }
+  constructor() { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log('summary',  this.memberSchedule);
+    this.checkDisplayStatus();
+  }
 
   onCollapse() {
       this.scheduleCollapsed = !this.scheduleCollapsed;
@@ -27,16 +30,38 @@ export class SchedulesummaryComponent implements OnInit {
   }
 
   getFormmattedDate(date) {
+
+    const workDate = new Date(date);
+
     let result = '';
 
-    const weekDays = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
+    const weekDays = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
 
-    result = result + weekDays[date.getDay()];
-    result = result + ' ' + date.getDate();
-    result = result + ' ' + this.getDisplayMonth(date.getMonth());
+    result = result + weekDays[workDate.getDay()];
+    result = result + ' ' + workDate.getDate();
+    result = result + ' ' + this.getDisplayMonth(workDate.getMonth());
     // result = result + date.getYear();
 
     return result;
+  }
+
+  checkDisplayStatus() {
+    const status = localStorage.getItem('scheduleDisplayStatus');
+
+    if (status === 'true') {
+      this.scheduleCollapsed = true;
+      this.hideMessage = false;
+    } else {
+      this.scheduleCollapsed = false;
+      this.hideMessage = true;
+    }
+  }
+
+  onCheckStatus() {
+
+
+    localStorage.setItem('scheduleDisplayStatus', this.hideMessage.toString());
+
   }
 
 }
