@@ -30,7 +30,7 @@ using QGym.API.Helpers;
 using System.Reflection;
 using Payment.DTOs;
 using Microsoft.Extensions.Options;
-using Payment.Utilities;
+//using Payment.Utilities;
 using IO = System.IO;
 using System.Data;
 
@@ -449,14 +449,15 @@ namespace QGym.API.Controllers
             {
                 //var token = _httpClientHelper.GetAsync<string>()
 
-                var si = new SignInDto() { Email = this._paymentSettings.Value.UserPayment, Password = this._paymentSettings.Value.PasswordPayment };
-                var response = await _httpClientHelper.PostAsync<Result<AuthenticationResult>, SignInDto>(si, this._paymentSettings.Value.AutenticateUri);
-                if (!response.IsSuccess)
-                {
-                    return BadRequest("El Pago no se pudo realizar, contacte al Administrador"); // Error por login con Payment Adalid
-                }
+                // Falta Payment.Utilitis de Adair
+                //var si = new SignInDto() { Email = this._paymentSettings.Value.UserPayment, Password = this._paymentSettings.Value.PasswordPayment };
+                //var response = await _httpClientHelper.PostAsync<Result<AuthenticationResult>, SignInDto>(si, this._paymentSettings.Value.AutenticateUri);
+                //if (!response.IsSuccess)
+                //{
+                //    return BadRequest("El Pago no se pudo realizar, contacte al Administrador"); // Error por login con Payment Adalid
+                //}
 
-                var token = response.Value.Token;
+                //var token = response.Value.Token;
 
 
 

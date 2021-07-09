@@ -27,7 +27,7 @@ using QGym.API.Helpers;
 using System.Reflection;
 using Payment.DTOs;
 using Microsoft.Extensions.Options;
-using Payment.Utilities;
+//using Payment.Utilities;
 using prometheus.dto.gym.Payment;
 
 namespace QGym.API.Controllers

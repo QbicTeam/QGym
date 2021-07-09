@@ -57,7 +57,7 @@ namespace QGym.API.Controllers
                 var codeConfirm = this._repo.GenerateConfirmationCode();
 
                 // Envio de Correo.
-                 new PrometheusServicesHelper(this._appSettings).SendEmail(memberDb.User.UserName, memberDb.User.DisplayName, codeConfirm);
+                 new PrometheusServicesHelper(this._appSettings).SendEmail(confirmation.Email, confirmation.MemberId, codeConfirm);
 
                 return Ok(codeConfirm);
             }
