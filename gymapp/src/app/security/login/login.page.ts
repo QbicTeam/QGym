@@ -21,7 +21,7 @@ export class LoginPage implements OnInit {
   ngOnInit() {
   }
 
-  ionViewDidEnter() {
+  clearValues() {
     // Clear form values
     this.loginForm.reset({
       email: '',
@@ -36,6 +36,8 @@ export class LoginPage implements OnInit {
       const userLogged = this.securityService.getCurrentLoggedUser();
 
       if (userLogged) {
+
+        this.clearValues();
 
         if (userLogged.role.toLowerCase() === 'miembro') {
 
