@@ -21,6 +21,11 @@ export class LoginPage implements OnInit {
   ngOnInit() {
   }
 
+  ionViewDidEnter() {
+    // Clear form values
+    this.loginForm.reset();
+  }
+
   onLogin() {
 
     this.securityService.login(this.loginForm.value.email, this.loginForm.value.password).subscribe(response => {
