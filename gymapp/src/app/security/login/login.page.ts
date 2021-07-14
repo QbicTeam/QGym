@@ -23,7 +23,10 @@ export class LoginPage implements OnInit {
 
   ionViewDidEnter() {
     // Clear form values
-    this.loginForm.reset();
+    this.loginForm.reset({
+      email: '',
+      password: ''
+    });
   }
 
   onLogin() {
