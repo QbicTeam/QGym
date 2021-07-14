@@ -83,11 +83,11 @@ export class MemberPage implements OnInit {
   }
 
   confirmationCodeMatchValidator(g: FormGroup) {
-    return g.get('confirmationCode').value === g.get('confirmationCodeSent').value ? null : { mismatchCode: true };
+    return g.get('confirmationCode').value == g.get('confirmationCodeSent').value ? null : { mismatchCode: true };
   }
 
   passwordMatchValidator(g: FormGroup) {
-    return g.get('password').value === g.get('confirmPassword').value ? null : { mismatch: true };
+    return g.get('password').value == g.get('confirmPassword').value ? null : { mismatch: true };
   }
 
   onRegisterMember() {
