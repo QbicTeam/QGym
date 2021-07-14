@@ -141,7 +141,7 @@ export class ConfigurationPage implements OnInit {
 
   logOut() {
     this.securityService.logOut();
-    this.router.navigateByUrl('/home');
+    this.router.navigateByUrl('/initsession/tabs/login');
   }
 
 }
